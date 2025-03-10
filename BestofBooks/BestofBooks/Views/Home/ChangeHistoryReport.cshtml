@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Change History Report";
+}
+@model BestofBooks.Models.ViewModels.ChangeHistoryReportViewModel
+
+<title>@ViewData["Title"] - BestofBooks</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<script src="~/js/site.js"></script>
+<script src="~/js/changeHistoryReport.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="text-center">
+        <h1 class="text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
+        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:1em" />
+    </div>
+</div>
+
+<div class="container text-center">
+    <p style="color: #0429AC; font-weight:bold; font-size:30px">Change History Report</p>
+    <form method="post">
+        <select id="chrUsername" name="UsernameFilter" asp-items="@Model.DimUsernames" style="background-color:#F5F5F5; text-align:center; height:1.65em">
+            <option value="" disabled selected>Select Username</option>
+        </select>
+
+        <select id="chUserLast" name="LastnameFilter" asp-items="@Model.DimLastnames" style="background-color:#F5F5F5; text-align:center; height:1.65em">
+            <option value="" disabled selected>Select Last Name</option>
+        </select>
+
+        <div class="dropdown">
+            <button type="button" onclick="dropdownStateCHI()" class="dropbtn" style="height:1.7em">Select Date</button>
+            <div id="dateRangeDropdown" class="dropdown-content">
+                <label for="beginDate">Begin Date:</label>
+                <input type="date" id="beginDate" name="StartDate">
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="EndDate">
+                <br />
+                <button type="button" class="datergOKBtn" onclick="returnStateCHI()" id="dateOKBtn" style="margin:.5em">OK</button>
+            </div>
+        </div>
+
+        <div class="container text-center" style="padding: 1em 0 1em 0">
+            <input type="submit" onclick="validateDates(event)" value="Search" style="color:#004803; border-color:#004803; background-color:#DBD9CA; font-weight:bold" />
+        </div>
+    </form>
+
+    @if (Model.Results.Count() > 0)
+    {
+        <div id="printArea">
+            <table class="table-hover table-bordered align-items-center" id="ListTable" cellspacing=5 cellpadding=5 border="1">
+                <tr class="text-center">
+                    <th>Table Name</th>
+                    <th>Change Action</th>
+                    <th>Username</th>
+                    <th>Date</th>
+                </tr>
+                <!-- hidden row-->
+                @foreach (var row in Model.Results)
+                {
+                    <tr class="text-center">
+                        <td size="10">@row.TableName</td>
+                        <td size="15">@row.Action</td>
+                        <td size="15">@row.ModifiedBy</td>
+                        <td size="15">@row.Modified</td>
+                    </tr>
+                }
+            </table>
+        </div>
+
+        <div class="container text-center" style="padding: 1em 0 1em 0">
+            <button type="button" onclick="printMe()" id="PrintBtn" name="changeHistoryReportPrintBtn">Print</button>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("Login")
+}

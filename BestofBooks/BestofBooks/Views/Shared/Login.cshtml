@@ -1,0 +1,58 @@
+﻿@*Needs to move to its own js file*@
+<script>
+    window.onload = (event) => {
+        document.getElementById("logInBtn").addEventListener("click", function(){
+            var postJson = {}
+            var postUrl = "/api/user/logIn";
+
+            postJson.username = $("#username").val();
+            postJson.password = $("#password").val();
+            $.ajax(postUrl, {
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(postJson),
+                success: function (data, status, xhr) {
+                    window.location.reload();
+                },
+                error: function (jqXhr, textStatus, errorMessage) {
+                    alert("Error: " + errorMessage);
+                }
+            });
+        })
+    };
+</script>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color:#DBD9CA">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="loginModalLabel">Log in or @Html.ActionLink("create an account.", "CreateAccount")</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm" asp-for="UserModel">
+                    <div>
+                        <label for="username" style="color:#0429AC">Username</label>
+                    </div>
+                    <div>
+                        <input type="text" id="username" name="username" required />
+                    </div>
+                    <div>
+                        <label for="password" style="color:#0429AC">Password</label>
+                    </div>
+                    <div>
+                        <input type="password" id="password" name="password" required />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelBtn" data-bs-dismiss="modal" style="color:#0429AC; background-color:#DAEDE2">Cancel</button>
+                <button type="button" id="logInBtn" style="color:#0429AC; background-color:#DAEDE2">Log In</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>

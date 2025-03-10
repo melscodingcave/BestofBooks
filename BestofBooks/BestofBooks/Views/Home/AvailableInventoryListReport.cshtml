@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Inventory Report";
+}
+@model BestofBooks.Models.ViewModels.AvailableReportViewModel
+
+<title>@ViewData["Title"] - BestofBooks</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<script src="~/js/site.js"></script>
+<script src="~/js/availableInvReport.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="text-center">
+        <h1 class="text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
+        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:1em" />
+    </div>
+</div>
+<div class="container text-center">
+    <form method="post">
+        <p style="color: #0429AC; font-weight:bold; font-size:30px">Available Inventory List Report</p>
+
+        <select name="BookFilters.Genre" id="irGenre" asp-items="@Model.bookGenres" style="background-color:#F5F5F5; text-align:center; height:1.6em">
+            <option value="" disabled selected>Select Genre</option>
+        </select>
+
+        <select name="BookFilters.Author" id="irGenre" asp-items="@Model.bookAuthors" style="background-color:#F5F5F5; text-align:center; height:1.6em">
+            <option value="" disabled selected>Select Author</option>
+        </select>
+
+        @*Still need to pull author names from DB and make it searchable*@
+        @*<div class="dropdown">
+            <button onclick="dropdownState()" class="dropbtn" style="height:1.6em">Select Author</button>
+            <div id="authorDropdown" class="dropdown-content">
+                <input type="text" placeholder="Search..." id="authorInput" onkeyup="filterFunction()" asp-for="@Model.bookFilters.Author" />
+            </div>
+        </div>*@
+
+        <select name="BookFilters.Stock" id="irInStock" style="background-color:#F5F5F5; text-align:center; height:1.6em">
+            <option value="" disabled selected>Select In Stock</option>
+            <option value="all">All</option>
+            <option value="instock">In Stock</option>
+            <option value="outofstock">Out of Stock</option>
+        </select>
+
+        <div class="container text-center" style="padding: 1em 0 1em 0">
+            <input type="submit" id="SearchBtn" name="inventoryReportSearchBtn" value="Search" />
+        </div>
+    </form>
+
+    @if (Model.listBooks.Count > 0)
+    {
+        <div id="printArea">
+            <form id="availableInventoryForm">
+                <table class="table-hover table-bordered align-items-center" id="ListTable" cellspacing=5 cellpadding=5 border="1">
+                    <tr class="text-center">
+                        <th>ISBN</th>
+                        <th>Title</th>
+                        <th>Author First Name</th>
+                        <th>Author Last Name</th>
+                        <th>Genre</th>
+                        <th>Location</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>InStock</th>
+                    </tr>
+                    @for (var i = 0; i < Model.listBooks.Count(); i++)
+                    {
+                        <tr>
+                            <td>@Model.listBooks[i].ISBN</td>
+                            <td>@Model.listBooks[i].Title</td>
+                            <td>@Model.listBooks[i].AuthorFirst</td>
+                            <td>@Model.listBooks[i].AuthorLast</td>
+                            <td>@Model.listBooks[i].Genre</td>
+                            <td>@Model.listBooks[i].Location</td>
+                            <td>@Model.listBooks[i].Price.ToString("0.00")</td>
+                            <td>@Model.listBooks[i].Quantity</td>
+                            <td>@Model.listBooks[i].InStock</td>
+                        </tr>
+                    }
+                </table>
+            </form>
+        </div>
+
+        <div class="container text-center" style="padding: 1em 0 1em 0">
+            <button type="button" onclick="printMe()" id="PrintBtn">Print</button>
+        </div>
+    }
+
+</div>
+
+@section Scripts
+{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("Login")
+}
+
+

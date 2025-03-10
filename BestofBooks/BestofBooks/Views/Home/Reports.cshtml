@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+}
+@model BestofBooks.Models.ViewModels.BaseViewModel
+
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+
+<div class="container-fluid my-4">
+    <div class="text-center">
+        <h1 class="text-wrap" style="color: #0429AC">Reports</h1>
+        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:1em" />
+    </div>
+</div>
+
+<div class="container text-center">
+    <h2 style="color: #0429AC">Select a Report</h2>
+    @if (Model.LoggedInUser != null && Model.LoggedInUser.is_Admin)
+    {
+    <p>@Html.ActionLink("Change History Report", "ChangeHistoryReport")</p>
+    }
+    <p>@Html.ActionLink("Inventory List Report", "AvailableInventoryListReport")</p>
+</div>
+
+
+
+@section Scripts
+{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("Login")
+}
+

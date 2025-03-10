@@ -1,0 +1,104 @@
+﻿@{
+    ViewData["Title"] = "Inventory";
+}
+@model BestofBooks.Models.ViewModels.InventoryListViewModel
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>@ViewData["Title"] - BestofBooks</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<script src="https://kit.fontawesome.com/f9f4cabcd6.js" crossorigin="anonymous"></script>
+<script src="~/js/inventoryList.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="text-center">
+        <h1 class="text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
+        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:3em" />
+        <p style="color: #0429AC">Our inventory is displayed below. Please let an employee know if you need any assistance!</p>
+    </div>
+</div>
+<div class="container text-center">
+    <table class="table-hover table-bordered align-items-center" id="ListTable" cellspacing=5 cellpadding=5 border="1" style="visibility:visible">
+        <tr class="text-center">
+            <th>ISBN</th>
+            <th>Title</th>
+            <th>Author First Name</th>
+            <th>Author Last Name</th>
+            <th>Genre</th>
+            <th>Location</th>
+            <th>Price</th>
+            <th>Quantity</th>
+        </tr>
+        @if (Model.LoggedInUser != null && Model.LoggedInUser.adds_enabled)
+        {
+            <form method="post">
+            <tr class="text-center">
+                <td><input id="new_ISBN" name = "newBook.ISBN" size="10" type="text" style="margin-bottom:0" placeholder="Enter ISBN" /></td>
+                <td><input id="new_title" name = "newBook.Title" type="text" size="15" style="margin-bottom:0" placeholder="Type the Title here..." /></td>
+                <td><input id="new_authorFirst" name = "newBook.AuthorFirst" type="text" size="15" style="margin-bottom:0" placeholder="Type the Author First Name here..." /></td>
+                <td><input id="new_authorLast" name = "newBook.AuthorLast" type="text" size="15" style="margin-bottom:0" placeholder="Type the Author Last Name here..." /></td>
+                <td><input id="new_genre" name = "newBook.Genre" type="text" size="10" style="margin-bottom:0" placeholder="Type the genre here..." /></td>
+                <td><input id="new_location" name = "newBook.Location" type="text" size="6" style="margin-bottom:0" placeholder="Type the location here..." /></td>
+                <td><input id="new_price" name = "newBook.Price" type="text" inputmode="numeric" pattern="[0-9]+([\.,][0-9]+)?" size="4" style="margin-bottom:0" placeholder="0.00" /></td>
+                <td><input id="new_qty" name ="newBook.Quantity" type="text" size="2" style="margin-bottom:0" placeholder="0" /></td>
+                <td><input id="addBtn" type="submit" name="Add" onclick="add_row" value="Add" style="color:#004803; text-align:center; background-color:#DBD9CA; border-color:#004803; font-weight:bold; font-family:'Bookman Old Style'" /></td>
+            </tr>
+            </form>
+        }
+        @for (var i = 0; i < Model.invListBooks.Count(); i++)
+        {
+            <tr>
+                <td id="invListISBN-@Model.invListBooks[i].Id">@Model.invListBooks[i].ISBN</td>
+                <td id="invListTitle-@Model.invListBooks[i].Id">@Model.invListBooks[i].Title</td>
+                <td id="invListAuthorFirst-@Model.invListBooks[i].Id">@Model.invListBooks[i].AuthorFirst</td>
+                <td id="invListAuthorLast-@Model.invListBooks[i].Id">@Model.invListBooks[i].AuthorLast</td>
+                <td id="invListGenre-@Model.invListBooks[i].Id">@Model.invListBooks[i].Genre</td>
+                <td id="invListLocation-@Model.invListBooks[i].Id">@Model.invListBooks[i].Location</td>
+                <td id="invListPrice-@Model.invListBooks[i].Id">@Model.invListBooks[i].Price.ToString("0.00")</td>
+                <td id="invListQty-@Model.invListBooks[i].Id">@Model.invListBooks[i].Quantity</td>
+                @if (Model.LoggedInUser != null && Model.LoggedInUser.edits_enabled)
+                {
+                    <td><input type="button" id="edit_btn" value="Edit" onclick="edit_row(@Model.invListBooks[i].Id)" style="color:#004803; text-align:center; background-color:#DBD9CA; border-color:#004803; font-weight:bold; font-family:'Bookman Old Style'" /></td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+<div id="editDialog" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/Home/InventoryListUpdate" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Book</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <input type="hidden" id="edit_Id" name="editBook.Id" value=0 />
+                        <table style="text-align: left">
+                            <tr><td>ISBN:</td><td><input id="edit_ISBN" name="editBook.ISBN" size="15" type="text" style="margin-bottom:0" placeholder="Enter ISBN" /></td></tr>
+                            <tr><td>Title:</td><td><input id="edit_title" name="editBook.Title" type="text" size="15" style="margin-bottom:0" placeholder="Type the Title here..." /></td></tr>
+                            <tr><td>Author First Name:</td><td><input id="edit_authorFirst" name="editBook.AuthorFirst" type="text" size="15" style="margin-bottom:0" placeholder="Type the Author First Name here..." /></td></tr>
+                            <tr><td>Auhthor Last Name:</td><td><input id="edit_authorLast" name="editBook.AuthorLast" type="text" size="15" style="margin-bottom:0" placeholder="Type the Author Last Name here..." /></td></tr>
+                            <tr><td>Genre:</td><td><input id="edit_genre" name="editBook.Genre" type="text" size="15" style="margin-bottom:0" placeholder="Type the genre here..." /></td></tr>
+                            <tr><td>Location:</td><td><input id="edit_location" name="editBook.Location" type="text" size="15" style="margin-bottom:0" placeholder="Type the location here..." /></td></tr>
+                            <tr><td>Price:</td><td><input id="edit_price" name="editBook.Price" type="text" inputmode="numeric" pattern="[0-9]+([\.,][0-9]+)?" size="15" style="margin-bottom:0" placeholder="0.00" /></td></tr>
+                            <tr><td>Quantity:</td><td><input id="edit_qty" name="editBook.Quantity" type="text" size="15" style="margin-bottom:0" placeholder="0" /></td></tr>
+                        </table>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cancel</button>
+                    <input id="saveBtn" class="btn btn-primary" type="submit" name="editSave" value="Save" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts
+    {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("Login")
+}

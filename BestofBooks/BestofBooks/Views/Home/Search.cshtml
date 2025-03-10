@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Search";
+}
+@model BestofBooks.Models.ViewModels.SearchViewModel
+
+<title>@ViewData["Title"] - BestofBooks</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<script src="~/js/site.js"></script>
+<script src="~/js/search.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="text-center">
+        <h1 class="text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
+        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:3em" />
+        <p style="color: #0429AC">Enter your search parameters below!!</p>
+    </div>
+</div>
+<form method="post">
+    <div class="container text-center" style="padding: .5em 0 .5em 0">
+
+        <select name="FilterType" id="searchOptions" asp-for="FilterType" style="background-color:#DBD9CA; text-align:center; height:1.6em; color:#004803">
+            <option value="" disabled selected>Select Filter Option</option>
+            <option value="Genre">Genre</option>
+            <option value="LastName">Author Last Name</option>
+            <option value="FirstName">Author First Name</option>
+            <option value="Title">Title</option>
+        </select>
+
+        <div class="text-body" style="padding: .5em 0 .5em 0">
+            <input type="text" id="textFilter" asp-for="Query" name="Query" maxlength="25" />
+        </div>
+    </div>
+    <div class="container text-center">
+        <input type="submit" style="color:#004803; border-color:#004803; background-color:#DBD9CA; font-weight:bold" value="Search" />
+        <button type="button" onclick="clearFilters()" style="color:#004803; border-color:#004803; background-color:#DBD9CA; font-weight:bold">Clear</button>
+    </div>
+</form>
+@if (Model.Results.Count > 0)
+{
+    <div class="container text-center" style="padding: .5em 0 .5em 0">
+        <table class="table-hover table-bordered align-items-center text-center" id="ListTable" cellspacing=5 cellpadding=5 border="1">
+            <tr class="text-center">
+                <th>ISBN</th>
+                <th>Title</th>
+                <th>Author First Name</th>
+                <th>Author Last Name</th>
+                <th>Genre</th>
+                <th>Location</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>In Stock</th>
+            </tr>
+            @for (var i = 0; i < Model.Results.Count(); i++)
+            {
+                <tr>
+                    <td>@Model.Results[i].ISBN</td>
+                    <td>@Model.Results[i].Title</td>
+                    <td>@Model.Results[i].AuthorFirst</td>
+                    <td>@Model.Results[i].AuthorLast</td>
+                    <td>@Model.Results[i].Genre</td>
+                    <td>@Model.Results[i].Location</td>
+                    <td>@Model.Results[i].Price.ToString("0.00")</td>
+                    <td>@Model.Results[i].Quantity</td>
+                    <td>@Model.Results[i].InStock</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts
+{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("Login")
+}

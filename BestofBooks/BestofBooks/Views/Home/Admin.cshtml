@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Admin";
+}
+@model BestofBooks.Models.ViewModels.UserViewModel
+
+<title>@ViewData["Title"]</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<script src="~/js/site.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="text-center m-auto">
+        <h1 class="text-center text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
+        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em" />
+    </div>
+</div>
+<div class="container-fluid table-responsive" id="adminListTable">
+    <div><h2 style="color:#0429AC">User List</h2></div>
+    <table class="table-hover table-bordered" style="background-color: #DBD9CA; color: #0429AC; margin: auto; width: 50%;" cellspacing=2 cellpadding=5 id="data_table" border="0">
+        <tr class="text-center">
+            <th>User First Name</th>
+            <th>User Last Name</th>
+            <th>User Type</th>
+            <th>View Only</th>
+            <th>Enable Adds</th>
+            <th>Enable Edits</th>
+            <th>Enable Deletes</th>
+            <th>Allow Admin</th>
+        </tr>
+        
+        @for (var i = 0; i < Model.listUsers.Count(); i++)
+        {
+        <tr class="hidden text-center">
+            <td> @Html.DisplayFor(model => model.listUsers[i].user_first)</td>
+            <td> @Html.DisplayFor(model => model.listUsers[i].user_last)</td>
+            <td> @Html.DisplayFor(model => model.listUsers[i].user_type)</td>
+            <td> <input type="checkbox" onclick="toggleViewOnly(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].is_ViewOnly ?"checked":"") /></td>
+            <td> <input type="checkbox" onclick="toggleAddsEnabled(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].adds_enabled ?"checked":"") /></td>
+            <td> <input type="checkbox" onclick="toggleEditsEnabled(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].edits_enabled ?"checked":"") /></td>
+            <td> <input type="checkbox" onclick="toggleDeletesEnabled(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].deletes_enabled ?"checked":"") /></td>
+            <td> <input type="checkbox" onclick="toggleIsAdmin(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].is_Admin ?"checked":"") /></td>
+        </tr>
+        }
+    </table>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
+@section Scripts
+    {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    @await Html.PartialAsync("Login")
+}
