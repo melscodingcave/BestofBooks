@@ -59,3 +59,27 @@ BestofBooks supports two types of users with different goals:
 # Clone the repo
 git clone https://github.com/melscodingcave/BestofBooks.git
 cd BestofBooks
+```
+
+### **Database Setup**
+
+1. Create a new SQL database.
+2. Run the SQL setup script (if provided in /database folder).
+3. Update the connection string in the project config file.
+
+## Run
+- Open the solution in Visual Studio → Build → Run.
+- The app will launch in your browser on a localhost URL (typically https://localhost:####/).
+
+## 🧪 Sample Future Enhancements
+
+- 🔐 Authentication (admin vs. customer accounts)
+- 📊 Advanced analytics & sales data
+- 📱 Responsive UI for mobile devices
+- 📦 Support ISBN scanning for inventory updates
+- 🧾 PDF/Excel report export
+
+## 🤝 Contributors
+
+Developed by Melanie Basso and another student engineer during the
+Purdue Global Internship Program (2023–2024).
