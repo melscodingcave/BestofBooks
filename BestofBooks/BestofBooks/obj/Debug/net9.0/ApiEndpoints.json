@@ -1,0 +1,146 @@
+[
+  {
+    "ContainingType": "BestofBooks.Controllers.BookController",
+    "Method": "getAvailInvList",
+    "RelativePath": "api/book/getAvailInvList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.BookModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.BookController",
+    "Method": "getBookSearchList",
+    "RelativePath": "api/book/getBookSearchList",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.BookModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "getChgHistRpt",
+    "RelativePath": "api/book/getChgHistRpt",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.BookModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "logInUser",
+    "RelativePath": "api/user/logIn",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.LogInUserModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "updateAddRights",
+    "RelativePath": "api/user/updateAddRights",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.updateUserModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "updateAdminRights",
+    "RelativePath": "api/user/updateAdminRights",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.updateUserModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "updateDeleteRights",
+    "RelativePath": "api/user/updateDeleteRights",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.updateUserModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "updateEditRights",
+    "RelativePath": "api/user/updateEditRights",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.updateUserModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BestofBooks.Controllers.UserController",
+    "Method": "updateViewOnlyRights",
+    "RelativePath": "api/user/updateViewOnlyRights",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "BestofBooks.Models.updateUserModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

@@ -2,13 +2,12 @@
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using Dapper;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
+using System.Data.SqlClient;
 
 namespace BestofBooks.Repo
 {

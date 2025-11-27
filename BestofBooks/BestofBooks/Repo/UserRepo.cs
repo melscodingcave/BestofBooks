@@ -4,13 +4,10 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
 using BestofBooks.Models;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace BestofBooks.Repo
 {
