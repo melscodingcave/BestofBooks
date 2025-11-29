@@ -1,0 +1,80 @@
+##############################
+# Visual Studio / .NET Ignore
+##############################
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]og/
+[Ll]ogs/
+
+# VS user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Generated folders
+.vs/
+*.ncrunchproject
+*.ncrunchsolution
+*.cache
+*.db
+*.opendb
+
+# ASP.NET temporary files
+App_Data/*.mdf
+App_Data/*.ldf
+App_Data/aspnet-*
+
+# NuGet Packages
+packages/
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+
+# Publish output
+publish/
+*.PublishSettings
+
+# Test results
+TestResult.xml
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Rider / Resharper / JetBrains
+_ReSharper*/
+*.DotSettings.user
+.idea/
+
+# VS Code
+.vscode/
+
+# Temp files
+*.tmp
+*.temp
+*.bak
+~$*
+
+# OS / Misc Metadata
+.DS_Store
+Thumbs.db
+
+##############################
+# Project-Specific Ignores
+##############################
+
+# LocalDB / SQL files
+*.mdf
+*.ldf
+
+# Secrets or configuration
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
