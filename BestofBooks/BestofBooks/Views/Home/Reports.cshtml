@@ -3,31 +3,76 @@
 }
 @model BestofBooks.Models.ViewModels.BaseViewModel
 
-
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/site.css" />
-
-<div class="container-fluid my-4">
-    <div class="text-center">
-        <h1 class="text-wrap" style="color: #0429AC">Reports</h1>
-        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:1em" />
+<%-- ── HERO ── --%>
+<div class="bob-hero mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="@Url.Content("~/Images/BestofBooks2.png")"
+             alt="BestofBooks logo"
+             style="height: 3rem; width: auto;" />
+        <div>
+            <h1 class="mb-0" style="font-size: 1.6rem;">Reports</h1>
+            <p class="mb-0" style="color: var(--bob-text-muted); font-size: 0.9rem;">
+                Inventory insights and change history for store staff.
+            </p>
+        </div>
     </div>
 </div>
 
-<div class="container text-center">
-    <h2 style="color: #0429AC">Select a Report</h2>
+<%-- ── REPORT CARDS ── --%>
+<div class="row g-3">
+
+    <%-- Inventory List Report — available to all logged-in users --%>
+    <div class="col-12 col-md-6">
+        <a asp-controller="Home" asp-action="AvailableInventoryListReport"
+           class="bob-card d-block text-decoration-none h-100"
+           style="transition: border-color 0.2s ease;">
+            <div class="d-flex align-items-start gap-3">
+                <div style="font-size: 1.75rem; line-height: 1;" aria-hidden="true">&#128218;</div>
+                <div>
+                    <h2 style="font-size: 1rem; margin-bottom: 0.25rem;">Inventory list report</h2>
+                    <p style="font-size: 0.875rem; color: var(--bob-text-muted); margin: 0;">
+                        View all currently available titles, stock levels, shelf locations,
+                        and pricing. Useful for restocking and customer queries.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-3" style="font-size: 0.8rem; color: var(--bob-accent); font-weight: 500;">
+                Open report &rarr;
+            </div>
+        </a>
+    </div>
+
+    <%-- Change History Report — admin only --%>
     @if (Model.LoggedInUser != null && Model.LoggedInUser.is_Admin)
     {
-    <p>@Html.ActionLink("Change History Report", "ChangeHistoryReport")</p>
+        <div class="col-12 col-md-6">
+            <a asp-controller="Home" asp-action="ChangeHistoryReport"
+               class="bob-card d-block text-decoration-none h-100">
+                <div class="d-flex align-items-start gap-3">
+                    <div style="font-size: 1.75rem; line-height: 1;" aria-hidden="true">&#128203;</div>
+                    <div>
+                        <h2 style="font-size: 1rem; margin-bottom: 0.25rem;">
+                            Change history report
+                            <span class="bob-badge bob-badge-warn ms-2"
+                                  style="font-size: 0.65rem; vertical-align: middle;">
+                                Admin only
+                            </span>
+                        </h2>
+                        <p style="font-size: 0.875rem; color: var(--bob-text-muted); margin: 0;">
+                            Review a full audit log of inventory changes — additions,
+                            edits, and removals — with timestamps and user attribution.
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-3" style="font-size: 0.8rem; color: var(--bob-accent); font-weight: 500;">
+                    Open report &rarr;
+                </div>
+            </a>
+        </div>
     }
-    <p>@Html.ActionLink("Inventory List Report", "AvailableInventoryListReport")</p>
+
 </div>
 
-
-
-@section Scripts
-{
+@section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-    @await Html.PartialAsync("Login")
 }
-

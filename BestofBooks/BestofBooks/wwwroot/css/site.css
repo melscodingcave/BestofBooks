@@ -1,283 +1,479 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+﻿/* ═══════════════════════════════════════════════
+   BestofBooks — Design System
+   Tournament Blue: #1A6BB5  (accent, always)
+   Dark mode: deep green-black felt
+   Light mode: clean white + pale blue
+   ═══════════════════════════════════════════════ */
 
-/* Privacy policy stylings */
-p {
-    color: #0429AC;
-}
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700&display=swap');
 
-h1 {
-    color: #004803;
-}
-
-h2 {
-    color: #004803;
-}
-
-h3 {
-    color: #004803;
-}
-
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  font-size: 14px;
-}
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+/* ── CSS Variables — light (default) ── */
+:root {
+    --bob-accent: #1A6BB5;
+    --bob-accent-hover: #2E8FE8;
+    --bob-accent-pale: #E6F1FB;
+    --bob-bg: #F8FAFB;
+    --bob-surface: #FFFFFF;
+    --bob-surface-2: #F1F5F9;
+    --bob-border: #E2E8EF;
+    --bob-text: #0F2318;
+    --bob-text-muted: #5A7A6A;
+    --bob-text-inverse: #FFFFFF;
+    --bob-nav-bg: #FFFFFF;
+    --bob-nav-border: #E2E8EF;
+    --bob-footer-bg: #F1F5F9;
+    --bob-success-bg: #E6F7EE;
+    --bob-success-text: #1A5C35;
+    --bob-success-border: #A8DFC0;
+    --bob-warn-bg: #FFF8E6;
+    --bob-warn-text: #7A4F00;
+    --bob-warn-border: #F5C875;
+    --bob-danger-bg: #FEF0EF;
+    --bob-danger-text: #8C1F1F;
+    --bob-danger-border: #F5BABA;
+    --bob-radius: 10px;
+    --bob-radius-sm: 6px;
+    --bob-transition: 0.2s ease;
 }
 
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+/* ── CSS Variables — dark ── */
+[data-theme="dark"] {
+    --bob-bg: #0D1A10;
+    --bob-surface: #0F2215;
+    --bob-surface-2: #0A1810;
+    --bob-border: #1E3A22;
+    --bob-text: #E8F4FF;
+    --bob-text-muted: #7BA88A;
+    --bob-nav-bg: #0A1510;
+    --bob-nav-border: #1E3A22;
+    --bob-footer-bg: #0A1510;
+    --bob-success-bg: #0F3020;
+    --bob-success-text: #4BC87A;
+    --bob-success-border: #1E5A30;
+    --bob-warn-bg: #2A1A00;
+    --bob-warn-text: #FAC775;
+    --bob-warn-border: #5A3800;
+    --bob-danger-bg: #2A0A0A;
+    --bob-danger-text: #F08080;
+    --bob-danger-border: #5A1A1A;
 }
 
-/* Sticky footer styles
--------------------------------------------------- */
-html {
-  position: relative;
-  min-height: 100%;
+/* ── Base ── */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
 body {
-    /* Margin bottom by footer height */
-    margin-bottom: 60px;
-}
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px; /* Vertically center the text there */
+    background-color: var(--bob-bg);
+    color: var(--bob-text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    transition: background-color var(--bob-transition), color var(--bob-transition);
 }
 
-/* Top Nav and Tab styles - excludes Login link
--------------------------------------------------- */
-.navLink {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #0429AC;
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', 'Inter', sans-serif;
+    color: var(--bob-text);
+    font-weight: 700;
 }
 
-    .navLink:hover, .navLink:focus {
-        text-decoration: none;
-        color: blueviolet;
-        font-weight: bold;
-    }
-
-    .navLink.disabled {
-        pointer-events: none;
-        cursor: default;
-    }
-
-    .navLink[aria-current="page"] {
-        background-color: #0429AC;
-        color: #DAEDE2;
-    }
-
-/* Top  Login Link Nav styles - kept separate to remove from aria styling
--------------------------------------------------- */
-.loginLink {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #0429AC;
+a {
+    color: var(--bob-accent);
+    text-decoration: none;
 }
 
-    .loginLink:hover, .loginLink:focus {
-        text-decoration: none;
-        color: blueviolet;
-        font-weight: bold;
+    a:hover {
+        color: var(--bob-accent-hover);
     }
 
-    .loginLink.disabled {
-        pointer-events: none;
-        cursor: default;
-    }
-
-/* createAccount Form styles
--------------------------------------------------- */
-#createAccountForm {
-    margin: 0 auto;
-    width: 60%;
-    position: relative;
-    font-family: "Bookshelf Old Style", Arial, sans-serif;
-    font-weight: 400;
-    font-size: 24px;
-    text-align: center;
-    line-height: 20px;
+/* ── Navbar ── */
+.bob-nav {
+    background-color: var(--bob-nav-bg);
+    border-bottom: 1px solid var(--bob-nav-border);
+    transition: background-color var(--bob-transition);
+    padding: 0.75rem 0;
 }
 
-    #createAccountForm select, input[type="text"], input[type=email], textarea {
-        background-color: #DAEDE2;
-        margin-bottom: 25px;
-    }
-
-    #createAccountBtn {
-        padding: 10px 20px;
-        background-color: #DBD9CA;
-        color: #004803;
-        border-color: #004803;
-    }
-
-/* Login Form styles
--------------------------------------------------- */
-#loginForm {
-    margin: 0 auto;
-    width: 60%;
-    position: relative;
-    font-weight: 400;
-    font-size: 24px;
-    text-align: center;
-    line-height: 20px;
+.bob-brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--bob-text) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    letter-spacing: -0.01em;
 }
 
-    #loginForm select, input[type="text"], input[type=email], input[type=password], textarea {
-        background-color: #F5F5F5;
-        margin-bottom: 25px;
+    .bob-brand:hover {
+        color: var(--bob-accent) !important;
     }
 
-    #loginForm button {
-        padding: 10px 20px;
-        margin-top: 50px;
-        background-color: #DBD9CA;
-        color: #0429AC;
+.bob-ball {
+    color: var(--bob-accent);
+    font-size: 1.1em;
+}
+
+.bob-link {
+    color: var(--bob-text-muted) !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 0.75rem !important;
+    border-radius: var(--bob-radius-sm);
+    transition: color var(--bob-transition), background-color var(--bob-transition);
+}
+
+    .bob-link:hover, .bob-link.active {
+        color: var(--bob-accent) !important;
+        background-color: var(--bob-accent-pale);
     }
-    #loginModalLabel {
-        color: #0429AC;
-    }
-/* Admin Table Styles
--------------------------------------------------- */
-#adminListTable h2 {
-    margin: 0 auto;
-    width: 60%;
-    position: relative;
-    text-align: center;
-    padding: 1em;
+
+[data-theme="dark"] .bob-link:hover,
+[data-theme="dark"] .bob-link.active {
+    background-color: rgba(26, 107, 181, 0.15);
 }
 
-#userType {
-    color: #004803;
-    background-color: #F5F5F5;
+.bob-toggler {
+    border: 1px solid var(--bob-border);
+    color: var(--bob-text-muted);
 }
 
-/* Input Styles 
--------------------------------------------------- */
-#input-style {
-    background-color: #F5F5F5;
-    align-content: center;
-}
-
-/* Report Dropdown Button Styles
--------------------------------------------------- */
-.dropbtn {
-    background-color: #F5F5F5;
-    color: black;
-    padding: 1em, 0;
-    font-size: 16px;
-    border-width: 1px;
-    border-color: black;
+/* ── Theme toggle button ── */
+.bob-theme-toggle {
+    background: none;
+    border: 1px solid var(--bob-border);
+    border-radius: var(--bob-radius-sm);
+    color: var(--bob-text-muted);
     cursor: pointer;
+    font-size: 1rem;
+    padding: 0.3rem 0.5rem;
+    line-height: 1;
+    transition: border-color var(--bob-transition), color var(--bob-transition);
 }
 
-/* Report Dropdown Button Hover & Focus Styles
--------------------------------------------------- */
-.dropbtn:hover, .dropbtn:focus {
-  background-color: #0429AC;
-  color: white;
-}
-
-/* Report Dropdown Search Field Styles
--------------------------------------------------- */
-#authorInput {
-    box-sizing: border-box;
-    background-image: url('searchicon.png');
-    background-position: 14px 12px;
-    background-repeat: no-repeat;
-    font-size: 16px;
-    padding: 14px 20px 12px 45px;
-    border: none;
-    border-bottom: 1px solid #ddd;
-}
-
-/* Report Dropdown Search Field Focus/Click Styles
--------------------------------------------------- */
-#authorInput:focus {
-    outline: 3px solid #ddd;
-}
-
-/* Report Dropdown container <div> - needed to position the dropdown content
--------------------------------------------------- */
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-/* Report Dropdown Content (Hidden by Default)
--------------------------------------------------- */
-.dropdown-content {
+    .bob-theme-toggle:hover {
+        border-color: var(--bob-accent);
+        color: var(--bob-accent);
+    }
+/* Show moon in light, sun in dark */
+.icon-sun {
     display: none;
+}
+
+.icon-moon {
+    display: inline;
+}
+
+[data-theme="dark"] .icon-sun {
+    display: inline;
+}
+
+[data-theme="dark"] .icon-moon {
+    display: none;
+}
+
+/* ── Auth buttons ── */
+.bob-btn-primary {
+    background-color: var(--bob-accent);
+    color: var(--bob-text-inverse) !important;
+    border: 1px solid var(--bob-accent);
+    border-radius: var(--bob-radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 1rem;
+    transition: background-color var(--bob-transition);
+}
+
+    .bob-btn-primary:hover {
+        background-color: var(--bob-accent-hover);
+        border-color: var(--bob-accent-hover);
+    }
+
+.bob-btn-outline {
+    background-color: transparent;
+    color: var(--bob-accent) !important;
+    border: 1px solid var(--bob-accent);
+    border-radius: var(--bob-radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 1rem;
+    transition: background-color var(--bob-transition);
+}
+
+    .bob-btn-outline:hover {
+        background-color: var(--bob-accent-pale);
+    }
+
+[data-theme="dark"] .bob-btn-outline:hover {
+    background-color: rgba(26, 107, 181, 0.15);
+}
+
+/* ── Logged-in user pill ── */
+.bob-user-pill {
+    background-color: var(--bob-surface-2);
+    border: 1px solid var(--bob-border);
+    border-radius: 99px;
+    color: var(--bob-text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+}
+
+/* ── Cards ── */
+.bob-card {
+    background-color: var(--bob-surface);
+    border: 1px solid var(--bob-border);
+    border-radius: var(--bob-radius);
+    padding: 1.25rem;
+    transition: border-color var(--bob-transition);
+}
+
+    .bob-card:hover {
+        border-color: var(--bob-accent);
+    }
+
+/* ── Stat bar ── */
+.bob-stat-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1px;
+    background-color: var(--bob-border);
+    border: 1px solid var(--bob-border);
+    border-radius: var(--bob-radius);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.bob-stat-cell {
+    background-color: var(--bob-surface);
+    padding: 1rem 1.25rem;
+    text-align: center;
+}
+
+.bob-stat-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--bob-accent);
+    font-family: 'Syne', sans-serif;
+}
+
+.bob-stat-label {
+    font-size: 0.75rem;
+    color: var(--bob-text-muted);
+    margin-top: 2px;
+}
+
+/* ── Tables ── */
+.bob-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+    .bob-table thead th {
+        background-color: var(--bob-surface-2);
+        color: var(--bob-text-muted);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--bob-border);
+    }
+
+    .bob-table tbody td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--bob-border);
+        color: var(--bob-text);
+        vertical-align: middle;
+    }
+
+    .bob-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .bob-table tbody tr:hover td {
+        background-color: var(--bob-surface-2);
+    }
+
+/* ── Badges ── */
+.bob-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    border-radius: 99px;
+    border: 1px solid transparent;
+}
+
+.bob-badge-success {
+    background-color: var(--bob-success-bg);
+    color: var(--bob-success-text);
+    border-color: var(--bob-success-border);
+}
+
+.bob-badge-warn {
+    background-color: var(--bob-warn-bg);
+    color: var(--bob-warn-text);
+    border-color: var(--bob-warn-border);
+}
+
+.bob-badge-danger {
+    background-color: var(--bob-danger-bg);
+    color: var(--bob-danger-text);
+    border-color: var(--bob-danger-border);
+}
+
+/* ── Forms ── */
+.bob-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--bob-text-muted);
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.bob-input {
+    width: 100%;
+    background-color: var(--bob-surface);
+    border: 1px solid var(--bob-border);
+    border-radius: var(--bob-radius-sm);
+    color: var(--bob-text);
+    font-size: 0.9rem;
+    padding: 0.5rem 0.85rem;
+    transition: border-color var(--bob-transition);
+    outline: none;
+}
+
+    .bob-input:focus {
+        border-color: var(--bob-accent);
+        box-shadow: 0 0 0 3px rgba(26,107,181,0.15);
+    }
+
+    .bob-input::placeholder {
+        color: var(--bob-text-muted);
+        opacity: 0.6;
+    }
+
+/* ── Login modal ── */
+.bob-modal {
+    background-color: var(--bob-surface);
+    border: 1px solid var(--bob-border);
+    border-radius: var(--bob-radius);
+    color: var(--bob-text);
+}
+
+.bob-modal-title {
+    font-family: 'Syne', sans-serif;
+    color: var(--bob-text);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.bob-close {
+    filter: var(--bs-btn-close-filter, none);
+}
+
+[data-theme="dark"] .bob-close {
+    filter: invert(1);
+}
+
+/* ── Footer ── */
+.bob-footer {
+    background-color: var(--bob-footer-bg);
+    border-top: 1px solid var(--bob-border);
+    font-size: 0.85rem;
+    color: var(--bob-text-muted);
+    margin-top: 3rem;
+}
+
+.bob-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 500;
+}
+
+.bob-footer-link {
+    color: var(--bob-text-muted);
+    margin-left: 1rem;
+    transition: color var(--bob-transition);
+}
+
+    .bob-footer-link:hover {
+        color: var(--bob-accent);
+    }
+
+/* ── Hero section (for index/search pages) ── */
+.bob-hero {
+    background-color: var(--bob-accent-pale);
+    border: 1px solid #BDD9F5;
+    border-radius: var(--bob-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .bob-hero {
+    background-color: rgba(26, 107, 181, 0.08);
+    border-color: rgba(26, 107, 181, 0.2);
+}
+/* Subtle felt dot pattern in hero */
+.bob-hero::before {
+    content: '';
     position: absolute;
-    background-color: #f6f6f6;
-    min-width: 230px;
-    border: 1px solid #ddd;
+    inset: 0;
+    background-image: radial-gradient(circle, var(--bob-border) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.bob-hero > * {
+    position: relative;
     z-index: 1;
 }
 
-/* Report Dropdown  links inside the dropdown
--------------------------------------------------- */
-.dropdown-content a {
-  color: #004803;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
+/* ── Utility ── */
+.bob-divider {
+    border: none;
+    border-top: 1px solid var(--bob-border);
+    margin: 1.5rem 0;
 }
 
-/* Report Dropdown  Change color of dropdown link on hover
--------------------------------------------------- */
-.dropdown-content a:hover {background-color: #f1f1f1}
-
-/* Show the dropdown menu (use JS to add this class to the
-.dropdown-content container when the user clicks on the dropdown button)
--------------------------------------------------- */
-.show {
-    display: block;
+/* ── DataTables dark mode overrides ── */
+[data-theme="dark"] .dataTables_wrapper {
+    color: var(--bob-text);
 }
 
-/* Report Button Stylings
-------------------------------------*/
-#SearchBtn {
-    color: #004803;
-    border-color: #004803;
-    background-color: #DBD9CA;
-    font-family: 'Bookman Old Style';
-    font-weight: bold;
+[data-theme="dark"] .dataTables_filter input,
+[data-theme="dark"] .dataTables_length select {
+    background-color: var(--bob-surface);
+    border-color: var(--bob-border);
+    color: var(--bob-text);
 }
 
-#PrintBtn {
-    color: #004803;
-    border-color: #004803;
-    background-color: #DBD9CA;
-    font-family: 'Bookman Old Style';
-    font-weight: bold;
+[data-theme="dark"] table.dataTable thead th,
+[data-theme="dark"] table.dataTable thead td {
+    border-bottom-color: var(--bob-border);
 }
 
-/* Table Stylings */
-#ListTable {
-    background-color: #DBD9CA;
-    color: #0429AC;
-    text-align: center;
-    display: inline-block;
+[data-theme="dark"] table.dataTable.stripe tbody tr.odd,
+[data-theme="dark"] table.dataTable.display tbody tr.odd {
+    background-color: var(--bob-surface-2);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .bob-stat-bar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .bob-hero {
+        padding: 1.25rem;
+    }
 }

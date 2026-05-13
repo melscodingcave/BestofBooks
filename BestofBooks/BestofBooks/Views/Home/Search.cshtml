@@ -3,75 +3,176 @@
 }
 @model BestofBooks.Models.ViewModels.SearchViewModel
 
-<title>@ViewData["Title"] - BestofBooks</title>
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/site.css" />
-<script src="~/js/site.js"></script>
-<script src="~/js/search.js"></script>
-
-<div class="container-fluid my-4">
-    <div class="text-center">
-        <h1 class="text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
-        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em; padding-bottom:3em" />
-        <p style="color: #0429AC">Enter your search parameters below!!</p>
-    </div>
-</div>
-<form method="post">
-    <div class="container text-center" style="padding: .5em 0 .5em 0">
-
-        <select name="FilterType" id="searchOptions" asp-for="FilterType" style="background-color:#DBD9CA; text-align:center; height:1.6em; color:#004803">
-            <option value="" disabled selected>Select Filter Option</option>
-            <option value="Genre">Genre</option>
-            <option value="LastName">Author Last Name</option>
-            <option value="FirstName">Author First Name</option>
-            <option value="Title">Title</option>
-        </select>
-
-        <div class="text-body" style="padding: .5em 0 .5em 0">
-            <input type="text" id="textFilter" asp-for="Query" name="Query" maxlength="25" />
+<%-- ── HERO ── --%>
+<div class="bob-hero mb-4">
+    <div class="d-flex align-items-center gap-3 mb-1">
+        <img src="@Url.Content("~/Images/BestofBooks2.png")"
+             alt="BestofBooks logo"
+             style="height: 3rem; width: auto;" />
+        <div>
+            <h1 class="mb-0" style="font-size: 1.6rem;">Search the catalog</h1>
+            <p class="mb-0" style="color: var(--bob-text-muted); font-size: 0.9rem;">
+                Find books and DVDs by title, author, or genre.
+            </p>
         </div>
     </div>
-    <div class="container text-center">
-        <input type="submit" style="color:#004803; border-color:#004803; background-color:#DBD9CA; font-weight:bold" value="Search" />
-        <button type="button" onclick="clearFilters()" style="color:#004803; border-color:#004803; background-color:#DBD9CA; font-weight:bold">Clear</button>
-    </div>
-</form>
-@if (Model.Results.Count > 0)
+</div>
+
+<%-- ── SEARCH FORM ── --%>
+<div class="bob-card mb-4">
+    <form method="post" id="searchForm">
+        <div class="row g-2 align-items-end">
+
+            <%-- Filter type dropdown --%>
+            <div class="col-12 col-md-3">
+                <label class="bob-label" for="searchOptions">Search by</label>
+                <select class="bob-input"
+                        name="FilterType"
+                        id="searchOptions"
+                        asp-for="FilterType">
+                    <option value="" disabled selected>Select a filter...</option>
+                    <option value="Title">Title</option>
+                    <option value="Genre">Genre</option>
+                    <option value="LastName">Author last name</option>
+                    <option value="FirstName">Author first name</option>
+                </select>
+            </div>
+
+            <%-- Query input --%>
+            <div class="col-12 col-md-7">
+                <label class="bob-label" for="textFilter">Search term</label>
+                <input class="bob-input"
+                       type="text"
+                       id="textFilter"
+                       asp-for="Query"
+                       name="Query"
+                       maxlength="100"
+                       placeholder="e.g. Efren Reyes, cue ball control, instructional..." />
+            </div>
+
+            <%-- Buttons --%>
+            <div class="col-12 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn bob-btn-primary w-100">Search</button>
+                <button type="button"
+                        class="btn bob-btn-outline"
+                        onclick="clearFilters()"
+                        aria-label="Clear search">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<%-- ── RESULTS ── --%>
+@if (Model.Results != null)
 {
-    <div class="container text-center" style="padding: .5em 0 .5em 0">
-        <table class="table-hover table-bordered align-items-center text-center" id="ListTable" cellspacing=5 cellpadding=5 border="1">
-            <tr class="text-center">
-                <th>ISBN</th>
-                <th>Title</th>
-                <th>Author First Name</th>
-                <th>Author Last Name</th>
-                <th>Genre</th>
-                <th>Location</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>In Stock</th>
-            </tr>
-            @for (var i = 0; i < Model.Results.Count(); i++)
-            {
-                <tr>
-                    <td>@Model.Results[i].ISBN</td>
-                    <td>@Model.Results[i].Title</td>
-                    <td>@Model.Results[i].AuthorFirst</td>
-                    <td>@Model.Results[i].AuthorLast</td>
-                    <td>@Model.Results[i].Genre</td>
-                    <td>@Model.Results[i].Location</td>
-                    <td>@Model.Results[i].Price.ToString("0.00")</td>
-                    <td>@Model.Results[i].Quantity</td>
-                    <td>@Model.Results[i].InStock</td>
-                </tr>
-            }
-        </table>
-    </div>
+    @if (Model.Results.Count == 0)
+    {
+        <%-- Empty state --%>
+        <div class="bob-card text-center py-5" style="color: var(--bob-text-muted);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;" aria-hidden="true">&#9899;</div>
+            <p class="mb-1" style="font-weight: 500; color: var(--bob-text);">No results found</p>
+            <p style="font-size: 0.9rem;">
+                Try a different search term or filter, or
+                <a asp-controller="Home" asp-action="InventoryList">browse the full inventory</a>.
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="bob-card p-0 mb-4" style="overflow: hidden;">
+
+            <%-- Result count header --%>
+            <div class="d-flex align-items-center justify-content-between px-4 py-3"
+                 style="border-bottom: 1px solid var(--bob-border);">
+                <span style="font-size: 0.85rem; color: var(--bob-text-muted);">
+                    <span style="font-weight: 600; color: var(--bob-accent);">
+                        @Model.Results.Count
+                    </span>
+                    result@(Model.Results.Count == 1 ? "" : "s") for
+                    &ldquo;<strong>@Model.Query</strong>&rdquo;
+                </span>
+                <a asp-controller="Home" asp-action="InventoryList"
+                   style="font-size: 0.8rem;">
+                    Browse all &rarr;
+                </a>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="bob-table" id="ListTable">
+                    <thead>
+                        <tr>
+                            <th>ISBN</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Genre</th>
+                            <th>Shelf</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var book in Model.Results)
+                        {
+                            var inStock   = book.Quantity > 0;
+                            var stockClass = book.Quantity == 0 ? "bob-badge-danger"
+                                          : book.Quantity <= 3  ? "bob-badge-warn"
+                                          : "bob-badge-success";
+                            var stockLabel = book.Quantity == 0 ? "Out of stock"
+                                          : book.Quantity <= 3  ? $"Low · {book.Quantity}"
+                                          : $"In stock · {book.Quantity}";
+
+                            <tr>
+                                <td style="font-size: 0.8rem; color: var(--bob-text-muted); font-family: monospace;">
+                                    @book.ISBN
+                                </td>
+                                <td style="font-weight: 500;">@book.Title</td>
+                                <td>@book.AuthorFirst @book.AuthorLast</td>
+                                <td style="font-size: 0.85rem; color: var(--bob-text-muted);">@book.Genre</td>
+                                <td>
+                                    <span class="bob-badge"
+                                          style="background: var(--bob-surface-2);
+                                                 border-color: var(--bob-border);
+                                                 color: var(--bob-accent);
+                                                 font-family: monospace;">
+                                        @book.Location
+                                    </span>
+                                </td>
+                                <td style="font-weight: 500;">$@book.Price.ToString("0.00")</td>
+                                <td>
+                                    <span class="bob-badge @stockClass">@stockLabel</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 }
 
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-@section Scripts
-{
+@section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-    @await Html.PartialAsync("Login")
+    <script>
+        function clearFilters() {
+            document.getElementById('searchOptions').value = '';
+            document.getElementById('textFilter').value = '';
+        }
+
+        @if (Model.Results != null && Model.Results.Count > 0)
+        {
+            <text>
+            $(document).ready(function () {
+                $('#ListTable').DataTable({
+                    pageLength: 25,
+                    order: [[1, 'asc']],
+                    searching: false,  // user already searched — no redundant box
+                    info: false
+                });
+            });
+            </text>
+        }
+    </script>
+    <script src="~/js/search.js" asp-append-version="true"></script>
 }

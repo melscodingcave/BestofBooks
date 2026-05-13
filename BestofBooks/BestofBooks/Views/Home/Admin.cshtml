@@ -3,52 +3,193 @@
 }
 @model BestofBooks.Models.ViewModels.UserViewModel
 
-<title>@ViewData["Title"]</title>
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/site.css" />
-<script src="~/js/site.js"></script>
-
-<div class="container-fluid my-4">
-    <div class="text-center m-auto">
-        <h1 class="text-center text-wrap" style="color: #0429AC">Welcome to Best of Books!</h1>
-        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:13em" />
+<%-- ── HERO ── --%>
+<div class="bob-hero mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="@Url.Content("~/Images/BestofBooks2.png")"
+             alt="BestofBooks logo"
+             style="height: 3rem; width: auto;" />
+        <div>
+            <h1 class="mb-0" style="font-size: 1.6rem;">Admin — user management</h1>
+            <p class="mb-0" style="color: var(--bob-text-muted); font-size: 0.9rem;">
+                Manage permissions for all registered users. Changes apply immediately.
+            </p>
+        </div>
     </div>
 </div>
-<div class="container-fluid table-responsive" id="adminListTable">
-    <div><h2 style="color:#0429AC">User List</h2></div>
-    <table class="table-hover table-bordered" style="background-color: #DBD9CA; color: #0429AC; margin: auto; width: 50%;" cellspacing=2 cellpadding=5 id="data_table" border="0">
-        <tr class="text-center">
-            <th>User First Name</th>
-            <th>User Last Name</th>
-            <th>User Type</th>
-            <th>View Only</th>
-            <th>Enable Adds</th>
-            <th>Enable Edits</th>
-            <th>Enable Deletes</th>
-            <th>Allow Admin</th>
-        </tr>
-        
-        @for (var i = 0; i < Model.listUsers.Count(); i++)
-        {
-        <tr class="hidden text-center">
-            <td> @Html.DisplayFor(model => model.listUsers[i].user_first)</td>
-            <td> @Html.DisplayFor(model => model.listUsers[i].user_last)</td>
-            <td> @Html.DisplayFor(model => model.listUsers[i].user_type)</td>
-            <td> <input type="checkbox" onclick="toggleViewOnly(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].is_ViewOnly ?"checked":"") /></td>
-            <td> <input type="checkbox" onclick="toggleAddsEnabled(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].adds_enabled ?"checked":"") /></td>
-            <td> <input type="checkbox" onclick="toggleEditsEnabled(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].edits_enabled ?"checked":"") /></td>
-            <td> <input type="checkbox" onclick="toggleDeletesEnabled(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].deletes_enabled ?"checked":"") /></td>
-            <td> <input type="checkbox" onclick="toggleIsAdmin(this, @Model.listUsers[i].BoBuser_id)" @(Model.listUsers[i].is_Admin ?"checked":"") /></td>
-        </tr>
-        }
-    </table>
+
+<%-- ── PERMISSION KEY ── --%>
+<div class="d-flex flex-wrap gap-2 mb-3" style="font-size: 0.78rem;">
+    <span style="color: var(--bob-text-muted); font-weight: 500; align-self: center;">Permissions:</span>
+    <span class="bob-badge bob-badge-warn">View only</span>
+    <span class="bob-badge" style="background:var(--bob-surface-2); border-color:var(--bob-border); color:var(--bob-text-muted);">Adds</span>
+    <span class="bob-badge" style="background:var(--bob-surface-2); border-color:var(--bob-border); color:var(--bob-text-muted);">Edits</span>
+    <span class="bob-badge" style="background:var(--bob-surface-2); border-color:var(--bob-border); color:var(--bob-text-muted);">Deletes</span>
+    <span class="bob-badge bob-badge-danger">Admin</span>
+    <span style="color: var(--bob-text-muted); font-size: 0.75rem; align-self: center;">
+        — checked = permission granted
+    </span>
 </div>
 
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<%-- ── USER TABLE ── --%>
+<div class="bob-card p-0" style="overflow: hidden;">
+    <div style="overflow-x: auto;">
+        <table class="bob-table" id="adminListTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>User type</th>
+                    <th class="text-center">View only</th>
+                    <th class="text-center">Adds</th>
+                    <th class="text-center">Edits</th>
+                    <th class="text-center">Deletes</th>
+                    <th class="text-center">Admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.listUsers.Count(); i++)
+                {
+                    var u = Model.listUsers[i];
+                    var isSelf = Model.LoggedInUser != null
+                    && Model.LoggedInUser.BoBuser_id == u.BoBuser_id;
 
+                    <tr class="@(isSelf ? "bob-self-row" : "")">
 
-@section Scripts
-    {
+                        <%-- Name --%>
+                        <td>
+                            <div style="font-weight: 500;">
+                                @u.user_first @u.user_last
+                            </div>
+                            @if (isSelf)
+                            {
+                                <div style="font-size: 0.72rem; color: var(--bob-text-muted);">
+                                    (your account)
+                                </div>
+                            }
+                        </td>
+
+                        <%-- User type --%>
+                        <td>
+                            <span class="bob-badge"
+                                  style="background: var(--bob-surface-2);
+                                             border-color: var(--bob-border);
+                                             color: var(--bob-text-muted);">
+                                @u.user_type
+                            </span>
+                        </td>
+
+                        <%-- View only --%>
+                        <td class="text-center">
+                            <label class="bob-toggle-label"
+                                   aria-label="View only for @u.user_first @u.user_last">
+                                <input type="checkbox"
+                                       class="bob-checkbox"
+                                       @(u.is_ViewOnly ? "checked" : "")
+                                       @(isSelf ? "disabled" : "")
+                                       onchange="toggleViewOnly(this, @u.BoBuser_id)" />
+                            </label>
+                        </td>
+
+                        <%-- Adds --%>
+                        <td class="text-center">
+                            <label class="bob-toggle-label"
+                                   aria-label="Enable adds for @u.user_first @u.user_last">
+                                <input type="checkbox"
+                                       class="bob-checkbox"
+                                       @(u.adds_enabled ? "checked" : "")
+                                       @(isSelf ? "disabled" : "")
+                                       onchange="toggleAddsEnabled(this, @u.BoBuser_id)" />
+                            </label>
+                        </td>
+
+                        <%-- Edits --%>
+                        <td class="text-center">
+                            <label class="bob-toggle-label"
+                                   aria-label="Enable edits for @u.user_first @u.user_last">
+                                <input type="checkbox"
+                                       class="bob-checkbox"
+                                       @(u.edits_enabled ? "checked" : "")
+                                       @(isSelf ? "disabled" : "")
+                                       onchange="toggleEditsEnabled(this, @u.BoBuser_id)" />
+                            </label>
+                        </td>
+
+                        <%-- Deletes --%>
+                        <td class="text-center">
+                            <label class="bob-toggle-label"
+                                   aria-label="Enable deletes for @u.user_first @u.user_last">
+                                <input type="checkbox"
+                                       class="bob-checkbox"
+                                       @(u.deletes_enabled ? "checked" : "")
+                                       @(isSelf ? "disabled" : "")
+                                       onchange="toggleDeletesEnabled(this, @u.BoBuser_id)" />
+                            </label>
+                        </td>
+
+                        <%-- Admin --%>
+                        <td class="text-center">
+                            <label class="bob-toggle-label"
+                                   aria-label="Grant admin to @u.user_first @u.user_last">
+                                <input type="checkbox"
+                                       class="bob-checkbox bob-checkbox-admin"
+                                       @(u.is_Admin ? "checked" : "")
+                                       @(isSelf ? "disabled" : "")
+                                       onchange="toggleIsAdmin(this, @u.BoBuser_id)" />
+                            </label>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%-- ── SELF-EDIT WARNING ── --%>
+@if (Model.listUsers.Any(u => Model.LoggedInUser != null
+                           && u.BoBuser_id == Model.LoggedInUser.BoBuser_id))
+{
+    <p class="mt-3" style="font-size: 0.8rem; color: var(--bob-text-muted);">
+        <span class="bob-badge bob-badge-warn me-1">Note</span>
+        Your own account row is locked — an admin cannot modify their own permissions.
+        Have another admin make changes to your account if needed.
+    </p>
+}
+
+@section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-    @await Html.PartialAsync("Login")
+
+    <style>
+        /* ── Checkbox styling ── */
+        .bob-checkbox {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--bob-accent);
+            cursor: pointer;
+        }
+
+        .bob-checkbox-admin {
+            accent-color: #A32D2D;
+        }
+
+        .bob-checkbox:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .bob-toggle-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* Highlight the logged-in user's own row */
+        .bob-self-row td {
+            background-color: var(--bob-surface-2) !important;
+        }
+    </style>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
 }
