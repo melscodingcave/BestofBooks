@@ -36,7 +36,7 @@ namespace BestofBooks
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/Home/Index";   // redirect here if not logged in
+                    options.LoginPath = "/Home/InventoryList";   // redirect here if not logged in
                     options.AccessDeniedPath = "/Home/Error";   // redirect here if not authorized
                     options.ExpireTimeSpan = TimeSpan.FromHours(8);
                     options.SlidingExpiration = true;           // reset timer on activity

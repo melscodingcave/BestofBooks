@@ -1,33 +1,60 @@
-﻿using System;
+﻿using BestofBooks.Models;
+using Dapper;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using BestofBooks.Models;
-using Dapper;
-using Microsoft.Extensions.Configuration;
 
 namespace BestofBooks.Repo
 {
-	public class AuditRepo : IAuditRepo
-	{
-        private readonly IConfiguration _config;
+    public class AuditRepo : IAuditRepo
+    {
+        private readonly string _connString;
 
         public AuditRepo(IConfiguration config)
         {
-            _config = config;
+            _connString = config.GetConnectionString("BestofBooks");
         }
+
+        private IDbConnection Connect() => new SqlConnection(_connString);
+
+        // ── UNFILTERED ────────────────────────────────────────────────────────
 
         public async Task<List<AuditRecord>> GetAuditRecords()
         {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
+            using var db = Connect();
+            var records = await db.QueryAsync<AuditRecord>(
+                "GetAuditRecords",
+                commandType: CommandType.StoredProcedure);
+            return records.ToList();
+        }
 
-            List<AuditRecord> records = (await dbConnection.QueryAsync<AuditRecord>("GetAuditRecords", new { }, commandType: CommandType.StoredProcedure)).ToList();
+        // ── FILTERED ──────────────────────────────────────────────────────────
+        // Passes filter params to SQL rather than loading everything into memory.
+        // NULL parameters are handled in the stored proc with IS NULL OR checks,
+        // so unset filters are simply ignored by the query.
 
-            return records;
+        public async Task<List<AuditRecord>> GetAuditRecords(
+            string? usernameFilter,
+            string? lastnameFilter,
+            DateTime? startDate,
+            DateTime? endDate)
+        {
+            using var db = Connect();
+            var records = await db.QueryAsync<AuditRecord>(
+                "GetAuditRecordsFiltered",
+                new
+                {
+                    UsernameFilter = usernameFilter,
+                    LastnameFilter = lastnameFilter,
+                    StartDate = startDate,
+                    EndDate = endDate
+                },
+                commandType: CommandType.StoredProcedure);
+            return records.ToList();
         }
     }
 }
-

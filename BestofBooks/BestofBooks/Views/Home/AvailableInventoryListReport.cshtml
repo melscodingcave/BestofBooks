@@ -3,7 +3,6 @@
 }
 @model BestofBooks.Models.ViewModels.AvailableReportViewModel
 
-<%-- ── HERO ── --%>
 <div class="bob-hero mb-4">
     <div class="d-flex align-items-center gap-3">
         <img src="@Url.Content("~/Images/BestofBooks2.png")"
@@ -18,12 +17,10 @@
     </div>
 </div>
 
-<%-- ── FILTER FORM ── --%>
 <div class="bob-card mb-4">
     <form method="post" id="reportFilterForm">
         <div class="row g-2 align-items-end">
 
-            <%-- Genre --%>
             <div class="col-12 col-md-3">
                 <label class="bob-label" for="irGenre">Genre</label>
                 <select class="bob-input"
@@ -34,7 +31,6 @@
                 </select>
             </div>
 
-            <%-- Author — now a searchable text input backed by datalist --%>
             <div class="col-12 col-md-4">
                 <label class="bob-label" for="irAuthor">Author</label>
                 <input class="bob-input"
@@ -52,7 +48,6 @@
                 </datalist>
             </div>
 
-            <%-- Stock status --%>
             <div class="col-12 col-md-3">
                 <label class="bob-label" for="irInStock">Stock status</label>
                 <select class="bob-input"
@@ -64,7 +59,6 @@
                 </select>
             </div>
 
-            <%-- Submit --%>
             <div class="col-12 col-md-2">
                 <button type="submit"
                         id="SearchBtn"
@@ -78,7 +72,6 @@
     </form>
 </div>
 
-<%-- ── RESULTS ── --%>
 @if (Model.listBooks != null)
 {
     @if (Model.listBooks.Count == 0)
@@ -92,7 +85,6 @@
     else
     {
         <div class="bob-card p-0 mb-3" style="overflow: hidden;" id="printArea">
-            <%-- Result header with print button --%>
             <div class="d-flex align-items-center justify-content-between px-4 py-3"
                  style="border-bottom: 1px solid var(--bob-border);">
                 <span style="font-size: 0.85rem; color: var(--bob-text-muted);">
@@ -201,6 +193,4 @@
             win.close();
         }
     </script>
-
-    <script src="~/js/availableInvReport.js" asp-append-version="true"></script>
 }

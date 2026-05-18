@@ -47,7 +47,7 @@ namespace BestofBooks.Controllers
             // Build claims from the user's permission flags
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name,      user.UserName),
+                new Claim(ClaimTypes.Name,      user.username),
                 new Claim("BoBuser_id",         user.BoBuser_id.ToString()),
                 new Claim("is_Admin",           user.is_Admin.ToString().ToLower()),
                 new Claim("edits_enabled",      user.edits_enabled.ToString().ToLower()),
@@ -63,8 +63,8 @@ namespace BestofBooks.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 principal);
 
-            _logger.LogInformation("User {Username} logged in.", user.UserName);
-            return Ok(new { username = user.UserName });
+            _logger.LogInformation("User {Username} logged in.", user.username);
+            return Ok(new { username = user.username });
         }
 
         // ── LOGOUT ────────────────────────────────────────────────────────────
@@ -138,18 +138,5 @@ namespace BestofBooks.Controllers
             return Ok(new { });
         }
 
-        // ── CHANGE HISTORY (admin only) ───────────────────────────────────────
-
-        [HttpGet]
-        [Route("api/book/getChgHistRpt")]
-        [Authorize(Policy = "RequireAdmin")]
-        public async Task<IActionResult> GetChangeHistoryReport()
-        {
-            // NOTE: BookModel was on the original [FromBody] but GET requests
-            // don't have a body — filter params should come from [FromQuery].
-            // Wire up filters here once the stored proc is updated.
-            var results = await _userRepo.getChangeHistory();
-            return Ok(results);
-        }
     }
 }

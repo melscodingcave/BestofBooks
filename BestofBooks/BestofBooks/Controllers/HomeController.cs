@@ -1,14 +1,16 @@
 ﻿using BestofBooks.Models;
 using BestofBooks.Models.ViewModels;
 using BestofBooks.Repo;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace BestofBooks.Controllers
@@ -20,7 +22,10 @@ namespace BestofBooks.Controllers
         private readonly IUserRepo _userRepo;
         private readonly IAuditRepo _auditRepo;
 
-        public HomeController(ILogger<HomeController> logger, IBookRepo bookRepo, IUserRepo userRepo, IAuditRepo auditRepo)
+        public HomeController(ILogger<HomeController> logger,
+                              IBookRepo bookRepo,
+                              IUserRepo userRepo,
+                              IAuditRepo auditRepo)
         {
             _logger = logger;
             _bookRepo = bookRepo;
@@ -28,54 +33,73 @@ namespace BestofBooks.Controllers
             _auditRepo = auditRepo;
         }
 
+        // ── Current user: read from cookie claims — zero DB cost ─────────────
+        // User.FindFirstValue reads the encrypted cookie already in memory.
+        // No database call, no session lookup.
+        private string CurrentUsername =>
+            User.FindFirstValue(ClaimTypes.Name) ?? "unauthorized";
+
+        // Builds a lightweight UserModel from claims for views that need it.
+        // Only hits the DB if the user is actually logged in.
+        private async Task<UserModel?> GetLoggedInUserAsync()
+        {
+            if (!User.Identity?.IsAuthenticated ?? true) return null;
+
+            var idClaim = User.FindFirstValue("BoBuser_id");
+            if (!int.TryParse(idClaim, out var userId)) return null;
+
+            return await _userRepo.getUserById(userId);
+        }
+
+        // ── INVENTORY LIST ────────────────────────────────────────────────────
+
         public async Task<IActionResult> InventoryList()
         {
-            List<BookModel> books = await _bookRepo.GetInventoryList();
-            books = books.Where(b => b.Quantity > 0).ToList();
+            var books = await _bookRepo.GetInventoryList();
             var model = new InventoryListViewModel
             {
-                invListBooks = books,
-                LoggedInUser = loggedInUser,
+                invListBooks = books.Where(b => b.Quantity > 0).ToList(),
+                LoggedInUser = await GetLoggedInUserAsync(),
                 newBook = new BookModel()
             };
             return View(model);
         }
 
         [HttpPost]
+        [Authorize(Policy = "RequireAdds")]
         public async Task<IActionResult> InventoryList(InventoryListViewModel model)
         {
-            await _bookRepo.CreateBook(model.newBook, loggedInUser.username);
+            await _bookRepo.CreateBook(model.newBook, CurrentUsername);
 
-            List<BookModel> books = await _bookRepo.GetInventoryList();
-            books = books.Where(b => b.Quantity > 0).ToList();
-            model.invListBooks = books;
-            model.LoggedInUser = loggedInUser;
+            var books = await _bookRepo.GetInventoryList();
+            model.invListBooks = books.Where(b => b.Quantity > 0).ToList();
+            model.LoggedInUser = await GetLoggedInUserAsync();
             model.newBook = new BookModel();
             return View(model);
         }
 
         [HttpPost]
+        [Authorize(Policy = "RequireEdits")]
         public async Task<IActionResult> InventoryListUpdate(InventoryListViewModel model)
         {
-            await _bookRepo.EditBook(model.editBook, loggedInUser.username);
+            await _bookRepo.EditBook(model.editBook, CurrentUsername);
 
-            List<BookModel> books = await _bookRepo.GetInventoryList();
-            books = books.Where(b => b.Quantity > 0).ToList();
-            model.invListBooks = books;
-            model.LoggedInUser = loggedInUser;
+            var books = await _bookRepo.GetInventoryList();
+            model.invListBooks = books.Where(b => b.Quantity > 0).ToList();
+            model.LoggedInUser = await GetLoggedInUserAsync();
             model.newBook = new BookModel();
             return View("InventoryList", model);
         }
 
-        public IActionResult Privacy()
-        {
-            var model = new BaseViewModel { LoggedInUser = loggedInUser };
-            return View(model);
-        }
+        // ── SEARCH ────────────────────────────────────────────────────────────
 
-        public IActionResult Search()
+        public async Task<IActionResult> Search()
         {
-            var model = new SearchViewModel { LoggedInUser = loggedInUser, Results = new List<BookModel>()};
+            var model = new SearchViewModel
+            {
+                LoggedInUser = await GetLoggedInUserAsync(),
+                Results = new List<BookModel>()
+            };
             return View(model);
         }
 
@@ -83,132 +107,175 @@ namespace BestofBooks.Controllers
         public async Task<IActionResult> Search(SearchViewModel model)
         {
             var books = await _bookRepo.GetInventoryList();
-            switch (model.FilterType)
+
+            // Case-insensitive partial matching — "efren" now finds "Efren Reyes"
+            var q = model.Query?.Trim() ?? string.Empty;
+
+            model.Results = model.FilterType switch
             {
-                case "Genre":
-                    books = books.Where(b => b.Genre == model.Query).ToList();
-                    break;
-                case "LastName":
-                    books = books.Where(b => b.AuthorLast == model.Query).ToList();
-                    break;
-                case "FirstName":
-                    books = books.Where(b => b.AuthorFirst == model.Query).ToList();
-                    break;
-                case "Title":
-                    books = books.Where(b => b.Title == model.Query).ToList();
-                    break;
-                default:
-                    books = new List<BookModel>();
-                    break;
-            }
+                "Genre" => books.Where(b => b.Genre
+                                  .Contains(q, StringComparison.OrdinalIgnoreCase)).ToList(),
+                "LastName" => books.Where(b => b.AuthorLast
+                                  .Contains(q, StringComparison.OrdinalIgnoreCase)).ToList(),
+                "FirstName" => books.Where(b => b.AuthorFirst
+                                  .Contains(q, StringComparison.OrdinalIgnoreCase)).ToList(),
+                "Title" => books.Where(b => b.Title
+                                  .Contains(q, StringComparison.OrdinalIgnoreCase)).ToList(),
+                _ => new List<BookModel>()
+            };
 
-            model.Results = books;
-            model.LoggedInUser = loggedInUser;
+            model.LoggedInUser = await GetLoggedInUserAsync();
             return View(model);
         }
 
-        public IActionResult Reports()
+        // ── REPORTS ───────────────────────────────────────────────────────────
+
+        [Authorize(Policy = "RequireLogin")]
+        public async Task<IActionResult> Reports()
         {
-            var model = new BaseViewModel { LoggedInUser = loggedInUser };
+            var model = new BaseViewModel { LoggedInUser = await GetLoggedInUserAsync() };
             return View(model);
         }
 
-        public IActionResult CreateAccount()
+        [Authorize(Policy = "RequireLogin")]
+        public async Task<IActionResult> AvailableInventoryListReport()
         {
-            var model = new CreateAccountViewModel { LoggedInUser = loggedInUser, UserToCreate = new UserModel() };
+            var model = new AvailableReportViewModel
+            {
+                bookAuthors = await _bookRepo.getAuthors(),
+                bookGenres = await _bookRepo.getGenres(),
+                listBooks = new List<BookModel>(),
+                bookFilters = new BookFilters(),
+                LoggedInUser = await GetLoggedInUserAsync()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "RequireLogin")]
+        public async Task<IActionResult> AvailableInventoryListReport(AvailableReportViewModel model)
+        {
+            var all = await _bookRepo.GetSearchList();
+
+            model.listBooks = all
+                .Where(b => string.IsNullOrEmpty(model.bookFilters?.Genre)
+                         || b.Genre.Equals(model.bookFilters.Genre, StringComparison.OrdinalIgnoreCase))
+                .Where(b => string.IsNullOrEmpty(model.bookFilters?.Author)
+                         || b.AuthorFullName.Contains(model.bookFilters.Author, StringComparison.OrdinalIgnoreCase))
+                .Where(b => model.bookFilters?.Stock is null or "all"
+                         || (model.bookFilters.Stock == "instock" && b.InStock)
+                         || (model.bookFilters.Stock == "outofstock" && !b.InStock))
+                .ToList();
+
+            // Repopulate dropdowns but keep the user's filter selections intact
+            model.bookAuthors = await _bookRepo.getAuthors();
+            model.bookGenres = await _bookRepo.getGenres();
+            model.LoggedInUser = await GetLoggedInUserAsync();
+            return View(model);
+        }
+
+        [Authorize(Policy = "RequireAdmin")]
+        public async Task<IActionResult> ChangeHistoryReport()
+        {
+            var model = new ChangeHistoryReportViewModel
+            {
+                LoggedInUser = await GetLoggedInUserAsync(),
+                DimUsernames = await _userRepo.getUserNames(),
+                DimLastnames = await _userRepo.getUserLastNames(),
+                Results = new List<AuditRecord>()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "RequireAdmin")]
+        public async Task<IActionResult> ChangeHistoryReport(ChangeHistoryReportViewModel model)
+        {
+            var records = await _auditRepo.GetAuditRecords(
+                model.UsernameFilter,
+                model.LastnameFilter,
+                model.StartDate,
+                model.EndDate);
+
+            model.DimUsernames = await _userRepo.getUserNames();
+            model.DimLastnames = await _userRepo.getUserLastNames();
+            model.LoggedInUser = await GetLoggedInUserAsync();
+            model.Results = records;
+            return View(model);
+        }
+
+        // ── ADMIN ─────────────────────────────────────────────────────────────
+
+        [Authorize(Policy = "RequireAdmin")]
+        public async Task<IActionResult> Admin()
+        {
+            var users = await _userRepo.getUsers();
+            var model = new UserViewModel
+            {
+                LoggedInUser = await GetLoggedInUserAsync(),
+                listUsers = users
+            };
+            return View(model);
+        }
+
+        // ── ACCOUNT CREATION ─────────────────────────────────────────────────
+
+        public async Task<IActionResult> CreateAccount()
+        {
+            var model = new CreateAccountViewModel
+            {
+                LoggedInUser = await GetLoggedInUserAsync(),
+                UserToCreate = new UserModel()
+            };
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateAccount(CreateAccountViewModel model)
+        public async Task<IActionResult> CreateAccount(CreateAccountViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                model.LoggedInUser = await GetLoggedInUserAsync();
+                return View(model);
+            }
+
             model.UserToCreate.password = SecurityUtilities.HashPassword(model.UserToCreate.password);
             model.UserToCreate.is_ViewOnly = true;
-            _userRepo.createUser(model.UserToCreate, model.UserToCreate.username);
-            var emptyModel = new CreateAccountViewModel { LoggedInUser = loggedInUser, UserToCreate = new UserModel() };
-            return View(emptyModel);
+
+            await _userRepo.createUser(model.UserToCreate, model.UserToCreate.username);
+
+            _logger.LogInformation("New account created for {Username}.", model.UserToCreate.username);
+
+            // Redirect after POST — prevents double-submit on browser refresh
+            return RedirectToAction(nameof(InventoryList));
         }
 
-        public async Task<IActionResult> Admin()
-        {
-            List<UserModel> admins = await _userRepo.getUsers();
-            var model = new UserViewModel { LoggedInUser = loggedInUser, listUsers = admins };
-            return View(model);
-        }
-
-        public async Task<IActionResult> AvailableInventoryListReport()
-        {
-            var model = new AvailableReportViewModel();
-            model.bookAuthors = await _bookRepo.getAuthors();
-            model.bookGenres = await _bookRepo.getGenres();
-            model.listBooks = new List<BookModel>();
-            model.bookFilters = new BookFilters();
-            model.LoggedInUser = loggedInUser;
-            return View(model);
-        }
+        // ── AUTH ──────────────────────────────────────────────────────────────
 
         [HttpPost]
-        public async Task<IActionResult> AvailableInventoryListReport(AvailableReportViewModel model)
+        public async Task<IActionResult> Logout()
         {
-            var filteredList = await _bookRepo.GetSearchList();
-            model.listBooks = filteredList
-                .Where(b => model.bookFilters == null || model.bookFilters.Genre == null || b.Genre == model.bookFilters.Genre)
-                .Where(b => model.bookFilters == null || model.bookFilters.Author == null || b.AuthorFullName == model.bookFilters.Author)
-                .Where(b => model.bookFilters == null || model.bookFilters.Stock == null || model.bookFilters.Stock == "all" || (model.bookFilters.Stock == "instock" && b.InStock) || (model.bookFilters.Stock == "outofstock" && !b.InStock))
-                .ToList();
-
-            model.bookAuthors = await _bookRepo.getAuthors();
-            model.bookGenres = await _bookRepo.getGenres();
-            model.LoggedInUser = loggedInUser;
-            model.bookFilters = new BookFilters();
-            return View(model);
+            _logger.LogInformation("User {Username} logged out.", CurrentUsername);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction(nameof(InventoryList));
         }
 
-        public async Task<IActionResult> ChangeHistoryReport()
+        // ── MISC ──────────────────────────────────────────────────────────────
+
+        public async Task<IActionResult> Privacy()
         {
-            var model = new ChangeHistoryReportViewModel { LoggedInUser = loggedInUser };
-            model.DimUsernames = await _userRepo.getUserNames();
-            model.DimLastnames = await _userRepo.getUserLastNames();
-            model.Results = new List<AuditRecord>();
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ChangeHistoryReport(ChangeHistoryReportViewModel model)
-        {
-            model.DimUsernames = await _userRepo.getUserNames();
-            model.DimLastnames = await _userRepo.getUserLastNames();
-
-            var records = await _auditRepo.GetAuditRecords();
-
-            if (!string.IsNullOrEmpty(model.UsernameFilter))
-                records = records.Where(a => a.ModifiedBy == model.UsernameFilter).ToList();
-            if (!string.IsNullOrEmpty(model.LastnameFilter))
-                records = records.Where(a => a.ModifiedLast == model.LastnameFilter).ToList();
-            if (model.StartDate != DateTime.MinValue)
-                records = records.Where(a => a.Modified >= model.StartDate).ToList();
-            if (model.EndDate != DateTime.MinValue)
-                records = records.Where(a => a.Modified <= model.EndDate.Date.AddDays(1).AddMinutes(-1)).ToList();
-
-            model.Results = records;
-            model.LoggedInUser = loggedInUser;
+            var model = new BaseViewModel { LoggedInUser = await GetLoggedInUserAsync() };
             return View(model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
-
-        public IActionResult Logout()
-        {
-            this.HttpContext.Session.SetInt32("_loggedInUser", 0);
-            return RedirectToAction("InventoryList");
-        }
-
-        private bool isUserLoggedIn => this.HttpContext.Session.GetInt32("_loggedInUser") != 0;
-        private UserModel loggedInUser => _userRepo.getUsers().Result.FirstOrDefault(u => u.BoBuser_id == this.HttpContext.Session.GetInt32("_loggedInUser"));
     }
 }

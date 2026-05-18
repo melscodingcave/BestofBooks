@@ -3,7 +3,6 @@
 }
 @model BestofBooks.Models.ViewModels.BaseViewModel
 
-<%-- ── HERO ── --%>
 <div class="bob-hero mb-4">
     <div class="d-flex align-items-center gap-3">
         <img src="@Url.Content("~/Images/BestofBooks2.png")"
@@ -18,10 +17,8 @@
     </div>
 </div>
 
-<%-- ── REPORT CARDS ── --%>
 <div class="row g-3">
 
-    <%-- Inventory List Report — available to all logged-in users --%>
     <div class="col-12 col-md-6">
         <a asp-controller="Home" asp-action="AvailableInventoryListReport"
            class="bob-card d-block text-decoration-none h-100"
@@ -42,7 +39,6 @@
         </a>
     </div>
 
-    <%-- Change History Report — admin only --%>
     @if (Model.LoggedInUser != null && Model.LoggedInUser.is_Admin)
     {
         <div class="col-12 col-md-6">

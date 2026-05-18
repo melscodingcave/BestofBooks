@@ -1,6 +1,33 @@
+# macOS
 .DS_Store
+
+# Build output
 bin/
 obj/
+
+# Visual Studio
 *.user
+.vs/
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
 .vscode/
+
+# Environment-specific app settings (contain secrets)
 appsettings.Development.json
+appsettings.Production.json
+
+# Published output
+publish/
+*.pubxml
+*.pubxml.user
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Logs
+*.log
+logs/

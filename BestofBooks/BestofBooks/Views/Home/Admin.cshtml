@@ -3,7 +3,6 @@
 }
 @model BestofBooks.Models.ViewModels.UserViewModel
 
-<%-- ── HERO ── --%>
 <div class="bob-hero mb-4">
     <div class="d-flex align-items-center gap-3">
         <img src="@Url.Content("~/Images/BestofBooks2.png")"
@@ -18,7 +17,6 @@
     </div>
 </div>
 
-<%-- ── PERMISSION KEY ── --%>
 <div class="d-flex flex-wrap gap-2 mb-3" style="font-size: 0.78rem;">
     <span style="color: var(--bob-text-muted); font-weight: 500; align-self: center;">Permissions:</span>
     <span class="bob-badge bob-badge-warn">View only</span>
@@ -31,7 +29,6 @@
     </span>
 </div>
 
-<%-- ── USER TABLE ── --%>
 <div class="bob-card p-0" style="overflow: hidden;">
     <div style="overflow-x: auto;">
         <table class="bob-table" id="adminListTable">
@@ -54,12 +51,8 @@
                     && Model.LoggedInUser.BoBuser_id == u.BoBuser_id;
 
                     <tr class="@(isSelf ? "bob-self-row" : "")">
-
-                        <%-- Name --%>
                         <td>
-                            <div style="font-weight: 500;">
-                                @u.user_first @u.user_last
-                            </div>
+                            <div style="font-weight: 500;">@u.user_first @u.user_last</div>
                             @if (isSelf)
                             {
                                 <div style="font-size: 0.72rem; color: var(--bob-text-muted);">
@@ -67,8 +60,6 @@
                                 </div>
                             }
                         </td>
-
-                        <%-- User type --%>
                         <td>
                             <span class="bob-badge"
                                   style="background: var(--bob-surface-2);
@@ -77,8 +68,6 @@
                                 @u.user_type
                             </span>
                         </td>
-
-                        <%-- View only --%>
                         <td class="text-center">
                             <label class="bob-toggle-label"
                                    aria-label="View only for @u.user_first @u.user_last">
@@ -89,8 +78,6 @@
                                        onchange="toggleViewOnly(this, @u.BoBuser_id)" />
                             </label>
                         </td>
-
-                        <%-- Adds --%>
                         <td class="text-center">
                             <label class="bob-toggle-label"
                                    aria-label="Enable adds for @u.user_first @u.user_last">
@@ -101,8 +88,6 @@
                                        onchange="toggleAddsEnabled(this, @u.BoBuser_id)" />
                             </label>
                         </td>
-
-                        <%-- Edits --%>
                         <td class="text-center">
                             <label class="bob-toggle-label"
                                    aria-label="Enable edits for @u.user_first @u.user_last">
@@ -113,8 +98,6 @@
                                        onchange="toggleEditsEnabled(this, @u.BoBuser_id)" />
                             </label>
                         </td>
-
-                        <%-- Deletes --%>
                         <td class="text-center">
                             <label class="bob-toggle-label"
                                    aria-label="Enable deletes for @u.user_first @u.user_last">
@@ -125,8 +108,6 @@
                                        onchange="toggleDeletesEnabled(this, @u.BoBuser_id)" />
                             </label>
                         </td>
-
-                        <%-- Admin --%>
                         <td class="text-center">
                             <label class="bob-toggle-label"
                                    aria-label="Grant admin to @u.user_first @u.user_last">
@@ -137,7 +118,6 @@
                                        onchange="toggleIsAdmin(this, @u.BoBuser_id)" />
                             </label>
                         </td>
-
                     </tr>
                 }
             </tbody>
@@ -145,7 +125,6 @@
     </div>
 </div>
 
-<%-- ── SELF-EDIT WARNING ── --%>
 @if (Model.listUsers.Any(u => Model.LoggedInUser != null
                            && u.BoBuser_id == Model.LoggedInUser.BoBuser_id))
 {
@@ -160,7 +139,6 @@
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <style>
-        /* ── Checkbox styling ── */
         .bob-checkbox {
             width: 1.1rem;
             height: 1.1rem;
@@ -185,7 +163,6 @@
             margin: 0;
         }
 
-        /* Highlight the logged-in user's own row */
         .bob-self-row td {
             background-color: var(--bob-surface-2) !important;
         }

@@ -1,142 +1,109 @@
 ﻿using BestofBooks.Models;
+using Dapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
-using System.Threading.Tasks;
-using Dapper;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BestofBooks.Repo
 {
     public class BookRepo : IBookRepo
     {
-        private readonly IConfiguration _config;
+        private readonly string _connString;
 
         public BookRepo(IConfiguration config)
         {
-            _config = config;
+            _connString = config.GetConnectionString("BestofBooks");
         }
+
+        private IDbConnection Connect() => new SqlConnection(_connString);
+
+        // ── INVENTORY ─────────────────────────────────────────────────────────
 
         public async Task<List<BookModel>> GetInventoryList()
         {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            List<BookModel> books = (await dbConnection.QueryAsync<BookModel>("GetInventoryList", new { }, commandType: CommandType.StoredProcedure)).ToList();
-
-            return books;
-        }
-
-        public async Task<List<SelectListItem>> getAuthors()
-        {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            List<Authors> authors = (await dbConnection.QueryAsync<Authors>("SELECT * FROM dbo.Author")).ToList();
-
-            return AuthorsToSelectListItems(authors);
-        }
-
-        private List<SelectListItem> AuthorsToSelectListItems(IEnumerable<Authors> authors)
-        {
-            return authors
-                .Select(l => new SelectListItem
-                {
-                    Text = $"{l.author_lastname}, {l.author_firstname}",
-                    Value = $"{l.author_lastname}, {l.author_firstname}"
-                })
-                .ToList();
-        }
-
-        public async Task<List<SelectListItem>> getGenres()
-        {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            List<Genre> genres = (await dbConnection.QueryAsync<Genre>("SELECT * FROM dbo.Genre")).ToList();
-
-            return GenresToSelectListItems(genres);
-        }
-
-        private List<SelectListItem> GenresToSelectListItems(IEnumerable<Genre> genres)
-        {
-            return genres
-                .Select(l => new SelectListItem
-                {
-                    Text = l.genre_type,
-                    Value = l.genre_type
-                })
-                .ToList();
-        }
-
-        public async Task<List<BookModel>> GetAvailableInventoryList()
-        {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            List<BookModel> books = (await dbConnection.QueryAsync<BookModel>("GetAvailableInventory", new { }, commandType: CommandType.StoredProcedure)).ToList();
-
-            return books;
+            using var db = Connect();
+            var books = await db.QueryAsync<BookModel>(
+                "GetInventoryList",
+                commandType: CommandType.StoredProcedure);
+            return books.ToList();
         }
 
         public async Task<List<BookModel>> GetSearchList()
         {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            List<BookModel> books = (await dbConnection.QueryAsync<BookModel>("BookSearch", new { }, commandType: CommandType.StoredProcedure)).ToList();
-
-            return books;
+            using var db = Connect();
+            var books = await db.QueryAsync<BookModel>(
+                "BookSearch",
+                commandType: CommandType.StoredProcedure);
+            return books.ToList();
         }
+
+        // ── CREATE / EDIT ─────────────────────────────────────────────────────
 
         public async Task CreateBook(BookModel newBook, string modifiedBy)
         {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            object[] parameters =
+            using var db = Connect();
+            await db.ExecuteAsync("CreateNewBook", new
             {
-                new {
-                    isbn = newBook.ISBN,
-                    title = newBook.Title,
-                    authorFirst = newBook.AuthorFirst,
-                    authorLast = newBook.AuthorLast,
-                    genre = newBook.Genre,
-                    location = newBook.Location,
-                    price = newBook.Price,
-                    quantity = newBook.Quantity,
-                    modifiedBy = modifiedBy
-                }
-            };
-
-            await dbConnection.ExecuteAsync("CreateNewBook", param: parameters, commandType: CommandType.StoredProcedure);
+                isbn = newBook.ISBN,
+                title = newBook.Title,
+                authorFirst = newBook.AuthorFirst,
+                authorLast = newBook.AuthorLast,
+                genre = newBook.Genre,
+                location = newBook.Location,
+                price = newBook.Price,
+                quantity = newBook.Quantity,
+                modifiedBy
+            },
+            commandType: CommandType.StoredProcedure);
         }
 
         public async Task EditBook(BookModel book, string modifiedBy)
         {
-            string connString = _config.GetConnectionString("BestofBooks");
-            using IDbConnection dbConnection = new SqlConnection(connString);
-
-            object[] parameters =
+            using var db = Connect();
+            await db.ExecuteAsync("EditBook", new
             {
-                new {
-                    bookID = book.Id,
-                    isbn = book.ISBN,
-                    title = book.Title,
-                    authorFirst = book.AuthorFirst,
-                    authorLast = book.AuthorLast,
-                    genre = book.Genre,
-                    location = book.Location,
-                    price = book.Price,
-                    quantity = book.Quantity,
-                    modifiedBy = modifiedBy
-                }
-            };
+                bookID = book.Id,
+                isbn = book.ISBN,
+                title = book.Title,
+                authorFirst = book.AuthorFirst,
+                authorLast = book.AuthorLast,
+                genre = book.Genre,
+                location = book.Location,
+                price = book.Price,
+                quantity = book.Quantity,
+                modifiedBy
+            },
+            commandType: CommandType.StoredProcedure);
+        }
 
-            await dbConnection.ExecuteAsync("EditBook", param: parameters, commandType: CommandType.StoredProcedure);
+        // ── DROPDOWN HELPERS ──────────────────────────────────────────────────
+
+        public async Task<List<SelectListItem>> getAuthors()
+        {
+            using var db = Connect();
+            var authors = await db.QueryAsync<Authors>(
+                "SELECT * FROM dbo.Author ORDER BY author_lastname");
+            return authors.Select(a => new SelectListItem
+            {
+                Text = $"{a.author_lastname}, {a.author_firstname}",
+                Value = $"{a.author_lastname}, {a.author_firstname}"
+            }).ToList();
+        }
+
+        public async Task<List<SelectListItem>> getGenres()
+        {
+            using var db = Connect();
+            var genres = await db.QueryAsync<Genre>(
+                "SELECT * FROM dbo.Genre ORDER BY genre_type");
+            return genres.Select(g => new SelectListItem
+            {
+                Text = g.genre_type,
+                Value = g.genre_type
+            }).ToList();
         }
     }
 }

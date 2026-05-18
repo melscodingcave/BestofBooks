@@ -3,7 +3,6 @@
 }
 @model BestofBooks.Models.ViewModels.ChangeHistoryReportViewModel
 
-<%-- ── HERO ── --%>
 <div class="bob-hero mb-4">
     <div class="d-flex align-items-center gap-3">
         <img src="@Url.Content("~/Images/BestofBooks2.png")"
@@ -18,12 +17,10 @@
     </div>
 </div>
 
-<%-- ── FILTER FORM ── --%>
 <div class="bob-card mb-4">
     <form method="post" id="reportFilterForm">
         <div class="row g-2 align-items-end">
 
-            <%-- Username filter --%>
             <div class="col-12 col-md-3">
                 <label class="bob-label" for="chrUsername">Username</label>
                 <select class="bob-input"
@@ -34,7 +31,6 @@
                 </select>
             </div>
 
-            <%-- Last name filter --%>
             <div class="col-12 col-md-3">
                 <label class="bob-label" for="chrLastname">Last name</label>
                 <select class="bob-input"
@@ -45,7 +41,6 @@
                 </select>
             </div>
 
-            <%-- Date range — plain native inputs, no custom dropdown needed --%>
             <div class="col-6 col-md-2">
                 <label class="bob-label" for="beginDate">From date</label>
                 <input class="bob-input"
@@ -54,6 +49,7 @@
                        name="StartDate"
                        value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
             </div>
+
             <div class="col-6 col-md-2">
                 <label class="bob-label" for="endDate">To date</label>
                 <input class="bob-input"
@@ -63,7 +59,6 @@
                        value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
             </div>
 
-            <%-- Submit --%>
             <div class="col-12 col-md-2">
                 <button type="submit"
                         class="btn bob-btn-primary w-100"
@@ -74,7 +69,6 @@
 
         </div>
 
-        <%-- Inline date validation error — shown by JS --%>
         <div id="dateError"
              class="mt-2"
              style="display: none; font-size: 0.82rem;
@@ -89,7 +83,6 @@
     </form>
 </div>
 
-<%-- ── RESULTS ── --%>
 @if (Model.Results != null)
 {
     @if (!Model.Results.Any())
@@ -104,7 +97,6 @@
     {
         <div class="bob-card p-0 mb-3" style="overflow: hidden;" id="printArea">
 
-            <%-- Header row with count + print --%>
             <div class="d-flex align-items-center justify-content-between px-4 py-3"
                  style="border-bottom: 1px solid var(--bob-border);">
                 <span style="font-size: 0.85rem; color: var(--bob-text-muted);">
@@ -148,9 +140,7 @@
                                     @row.TableName
                                 </td>
                                 <td>
-                                    <span class="bob-badge @actionClass">
-                                        @row.Action
-                                    </span>
+                                    <span class="bob-badge @actionClass">@row.Action</span>
                                 </td>
                                 <td style="font-weight: 500;">@row.ModifiedBy</td>
                                 <td style="font-size: 0.85rem; color: var(--bob-text-muted);">
@@ -175,13 +165,12 @@
                     <text>
                     $('#ListTable').DataTable({
                         pageLength: 25,
-                        order: [[3, 'desc']],   // newest first
+                        order: [[3, 'desc']],
                         columnDefs: [{ orderable: false, targets: -1 }]
                     });
                     </text>
             }
 
-            // Date range validation — replaces validateDates(event)
             $('#reportFilterForm').on('submit', function (e) {
                 const start = document.getElementById('beginDate').value;
                 const end   = document.getElementById('endDate').value;
@@ -221,6 +210,4 @@
             win.close();
         }
     </script>
-
-    <script src="~/js/changeHistoryReport.js" asp-append-version="true"></script>
 }

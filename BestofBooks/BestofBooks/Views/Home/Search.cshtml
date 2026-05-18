@@ -3,7 +3,6 @@
 }
 @model BestofBooks.Models.ViewModels.SearchViewModel
 
-<%-- ── HERO ── --%>
 <div class="bob-hero mb-4">
     <div class="d-flex align-items-center gap-3 mb-1">
         <img src="@Url.Content("~/Images/BestofBooks2.png")"
@@ -18,12 +17,9 @@
     </div>
 </div>
 
-<%-- ── SEARCH FORM ── --%>
 <div class="bob-card mb-4">
     <form method="post" id="searchForm">
         <div class="row g-2 align-items-end">
-
-            <%-- Filter type dropdown --%>
             <div class="col-12 col-md-3">
                 <label class="bob-label" for="searchOptions">Search by</label>
                 <select class="bob-input"
@@ -38,7 +34,6 @@
                 </select>
             </div>
 
-            <%-- Query input --%>
             <div class="col-12 col-md-7">
                 <label class="bob-label" for="textFilter">Search term</label>
                 <input class="bob-input"
@@ -50,7 +45,6 @@
                        placeholder="e.g. Efren Reyes, cue ball control, instructional..." />
             </div>
 
-            <%-- Buttons --%>
             <div class="col-12 col-md-2 d-flex gap-2">
                 <button type="submit" class="btn bob-btn-primary w-100">Search</button>
                 <button type="button"
@@ -64,12 +58,10 @@
     </form>
 </div>
 
-<%-- ── RESULTS ── --%>
 @if (Model.Results != null)
 {
     @if (Model.Results.Count == 0)
     {
-        <%-- Empty state --%>
         <div class="bob-card text-center py-5" style="color: var(--bob-text-muted);">
             <div style="font-size: 2.5rem; margin-bottom: 0.5rem;" aria-hidden="true">&#9899;</div>
             <p class="mb-1" style="font-weight: 500; color: var(--bob-text);">No results found</p>
@@ -82,8 +74,6 @@
     else
     {
         <div class="bob-card p-0 mb-4" style="overflow: hidden;">
-
-            <%-- Result count header --%>
             <div class="d-flex align-items-center justify-content-between px-4 py-3"
                  style="border-bottom: 1px solid var(--bob-border);">
                 <span style="font-size: 0.85rem; color: var(--bob-text-muted);">
@@ -115,13 +105,12 @@
                     <tbody>
                         @foreach (var book in Model.Results)
                         {
-                            var inStock   = book.Quantity > 0;
                             var stockClass = book.Quantity == 0 ? "bob-badge-danger"
-                                          : book.Quantity <= 3  ? "bob-badge-warn"
-                                          : "bob-badge-success";
+                            : book.Quantity <= 3 ? "bob-badge-warn"
+                            : "bob-badge-success";
                             var stockLabel = book.Quantity == 0 ? "Out of stock"
-                                          : book.Quantity <= 3  ? $"Low · {book.Quantity}"
-                                          : $"In stock · {book.Quantity}";
+                            : book.Quantity <= 3 ? $"Low · {book.Quantity}"
+                            : $"In stock · {book.Quantity}";
 
                             <tr>
                                 <td style="font-size: 0.8rem; color: var(--bob-text-muted); font-family: monospace;">
@@ -133,9 +122,9 @@
                                 <td>
                                     <span class="bob-badge"
                                           style="background: var(--bob-surface-2);
-                                                 border-color: var(--bob-border);
-                                                 color: var(--bob-accent);
-                                                 font-family: monospace;">
+                                                             border-color: var(--bob-border);
+                                                             color: var(--bob-accent);
+                                                             font-family: monospace;">
                                         @book.Location
                                     </span>
                                 </td>
@@ -162,17 +151,16 @@
 
         @if (Model.Results != null && Model.Results.Count > 0)
         {
-            <text>
-            $(document).ready(function () {
-                $('#ListTable').DataTable({
-                    pageLength: 25,
-                    order: [[1, 'asc']],
-                    searching: false,  // user already searched — no redundant box
-                    info: false
+                <text>
+                $(document).ready(function () {
+                    $('#ListTable').DataTable({
+                        pageLength: 25,
+                        order: [[1, 'asc']],
+                        searching: false,
+                        info: false
+                    });
                 });
-            });
-            </text>
+                </text>
         }
     </script>
-    <script src="~/js/search.js" asp-append-version="true"></script>
 }

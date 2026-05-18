@@ -3,70 +3,131 @@
 }
 @model BestofBooks.Models.ViewModels.CreateAccountViewModel
 
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>@ViewData["Title"]</title>
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/site.css" />
-
-<div class="container-fluid my-4">
-    <div class="text-center m-auto">
-        <h1 class="text-center text-wrap" style="color: #0429AC">Create an Account</h1>
-        <img src="@Url.Content("~/Images/BestofBooks2.png")" class="img-fluid" style="width:5em" />
+<div class="bob-hero mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="@Url.Content("~/Images/BestofBooks2.png")"
+             alt="BestofBooks logo"
+             style="height: 3rem; width: auto;" />
+        <div>
+            <h1 class="mb-0" style="font-size: 1.6rem;">Create an account</h1>
+            <p class="mb-0" style="color: var(--bob-text-muted); font-size: 0.9rem;">
+                Already have one? <a data-bs-toggle="modal" data-bs-target="#loginModal">Log in here.</a>
+            </p>
+        </div>
     </div>
 </div>
 
-<div class="container-fluid">
-    @using (Html.BeginForm("CreateAccount", "Home", FormMethod.Post, new {id="createAccountForm"}))
-    {
-        <div>
-            <label for="firstName" style="color:#0429AC">First Name</label>
+<div class="bob-card" style="max-width: 520px;">
+    <form asp-controller="Home" asp-action="CreateAccount" method="post" id="createAccountForm">
+
+        <div class="row g-3">
+            <div class="col-6">
+                <label class="bob-label" for="firstName">First name</label>
+                <input class="bob-input" type="text" id="firstName"
+                       asp-for="UserToCreate.user_first" required
+                       autocomplete="given-name" />
+                <span asp-validation-for="UserToCreate.user_first"
+                      style="font-size:0.78rem; color: var(--bob-danger-text);"></span>
+            </div>
+            <div class="col-6">
+                <label class="bob-label" for="lastName">Last name</label>
+                <input class="bob-input" type="text" id="lastName"
+                       asp-for="UserToCreate.user_last" required
+                       autocomplete="family-name" />
+                <span asp-validation-for="UserToCreate.user_last"
+                      style="font-size:0.78rem; color: var(--bob-danger-text);"></span>
+            </div>
+
+            <div class="col-12">
+                <label class="bob-label" for="email">Email address</label>
+                <input class="bob-input" type="email" id="email"
+                       asp-for="UserToCreate.user_email" required
+                       autocomplete="email" />
+                <span asp-validation-for="UserToCreate.user_email"
+                      style="font-size:0.78rem; color: var(--bob-danger-text);"></span>
+            </div>
+
+            <div class="col-12">
+                <label class="bob-label" for="username">Username</label>
+                <input class="bob-input" type="text" id="username"
+                       asp-for="UserToCreate.username" required
+                       autocomplete="username" />
+                <span asp-validation-for="UserToCreate.username"
+                      style="font-size:0.78rem; color: var(--bob-danger-text);"></span>
+            </div>
+
+            <div class="col-12">
+                <label class="bob-label" for="password">Password</label>
+                <input class="bob-input" type="password" id="password"
+                       asp-for="UserToCreate.password" required
+                       autocomplete="new-password"
+                       minlength="8" />
+                <span asp-validation-for="UserToCreate.password"
+                      style="font-size:0.78rem; color: var(--bob-danger-text);"></span>
+                <div style="font-size: 0.75rem; color: var(--bob-text-muted); margin-top: 0.25rem;">
+                    Minimum 8 characters.
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="bob-label" for="confirmPassword">Confirm password</label>
+                <input class="bob-input" type="password" id="confirmPassword"
+                       autocomplete="new-password" required />
+                <div id="passwordMismatch"
+                     style="display:none; font-size:0.78rem; color: var(--bob-danger-text); margin-top:0.25rem;">
+                    Passwords do not match.
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="bob-label" for="userType">Account type</label>
+                <select class="bob-input" id="userType"
+                        asp-for="UserToCreate.user_type" required>
+                    <option value="guest">Guest</option>
+                    <option value="employee">Employee</option>
+                </select>
+                <span asp-validation-for="UserToCreate.user_type"
+                      style="font-size:0.78rem; color: var(--bob-danger-text);"></span>
+            </div>
         </div>
-        <div>
-            <input type="text" id="firstName" asp-for="@Model.UserToCreate.user_first" required />
+
+        <hr class="bob-divider" />
+
+        <div class="d-flex gap-2">
+            <button type="submit" id="createAccountBtn" class="btn bob-btn-primary">
+                Create account
+            </button>
+            <a asp-controller="Home" asp-action="InventoryList"
+               class="btn bob-btn-outline">
+                Cancel
+            </a>
         </div>
-        <div>
-            <label for="lastName" style="color:#0429AC">Last Name</label>
-        </div>
-        <div>
-            <input type="text" id="lastName" asp-for="@Model.UserToCreate.user_last" required />
-        </div>
-        <div>
-            <label for="email" style="color:#0429AC">E-mail</label>
-        </div>
-        <div>
-            <input type="email" id="email" asp-for="@Model.UserToCreate.user_email" required />
-        </div>
-        <div>
-            <label for="username" style="color:#0429AC">Username</label>
-        </div>
-        <div>
-            <input type="text" id="username" asp-for="@Model.UserToCreate.username" required />
-        </div>
-        <div>
-            <label for="password" style="color:#0429AC">Password</label>
-        </div>
-        <div>
-            <input type="password" id="password" asp-for="@Model.UserToCreate.password" required />
-        </div>
-        <div>
-            <label for="userType" style="color:#0429AC">User Type</label>
-        </div>
-        <div>
-            <select id="userType" asp-for="@Model.UserToCreate.user_type" required style="background-color:#F5F5F5; text-align:center">
-                <option value="guest">Guest</option>
-                <option value="employee">Employee</option>
-            </select>
-        </div>
-        <input type="submit" value="Create Account" id="createAccountBtn"/>
-}
+
+    </form>
 </div>
 
-
-
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-@section Scripts
-    {
+@section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
-    @await Html.PartialAsync("Login")
+    <script>
+        // Client-side password confirmation check
+        const form       = document.getElementById('createAccountForm');
+        const pw         = document.getElementById('password');
+        const confirm    = document.getElementById('confirmPassword');
+        const mismatch   = document.getElementById('passwordMismatch');
+
+        form.addEventListener('submit', function (e) {
+            if (pw.value !== confirm.value) {
+                e.preventDefault();
+                mismatch.style.display = 'block';
+                confirm.focus();
+            } else {
+                mismatch.style.display = 'none';
+            }
+        });
+
+        confirm.addEventListener('input', function () {
+            mismatch.style.display = pw.value && confirm.value && pw.value !== confirm.value
+                ? 'block' : 'none';
+        });
+    </script>
 }

@@ -3,7 +3,6 @@
 }
 @model BestofBooks.Models.ViewModels.InventoryListViewModel
 
-<%-- ── HERO ── --%>
 <div class="bob-hero mb-4">
     <div class="d-flex align-items-center gap-3 mb-2">
         <img src="@Url.Content("~/Images/BestofBooks2.png")"
@@ -17,7 +16,6 @@
         </div>
     </div>
 
-    <%-- Stat bar --%>
     <div class="bob-stat-bar mt-3">
         <div class="bob-stat-cell">
             <div class="bob-stat-num">@Model.invListBooks.Count()</div>
@@ -34,7 +32,6 @@
     </div>
 </div>
 
-<%-- ── ADD BOOK FORM (owner only — above the table, not inside it) ── --%>
 @if (Model.LoggedInUser != null && Model.LoggedInUser.adds_enabled)
 {
     <div class="bob-card mb-4">
@@ -87,7 +84,6 @@
     </div>
 }
 
-<%-- ── INVENTORY TABLE ── --%>
 <div class="bob-card p-0" style="overflow: hidden;">
     <div style="overflow-x: auto;">
         <table class="bob-table" id="ListTable">
@@ -115,7 +111,7 @@
                     : "bob-badge-success";
                     var stockLabel = book.Quantity == 0 ? "Out of stock"
                     : book.Quantity <= 3 ? $"Low · {book.Quantity}"
-                    : book.Quantity.ToString();
+                    : $"In stock · {book.Quantity}";
 
                     <tr>
                         <td id="invListISBN-@book.Id"
@@ -165,7 +161,6 @@
     </div>
 </div>
 
-<%-- ── EDIT MODAL ── --%>
 @if (Model.LoggedInUser != null && Model.LoggedInUser.edits_enabled)
 {
     <div class="modal fade" id="editDialog" tabindex="-1"

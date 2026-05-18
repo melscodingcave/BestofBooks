@@ -24,6 +24,14 @@
           rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <%-- Theme init runs before paint to prevent flash of wrong theme --%>
+    <script>
+        (function () {
+            const saved = localStorage.getItem('bob-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
 </head>
 
 <body>
@@ -91,11 +99,11 @@
                     else
                     {
                         <span class="bob-user-pill">
-                            @Model.LoggedInUser.UserName
+                            @Model.LoggedInUser.username
                         </span>
-                        <a class="btn bob-btn-outline" asp-controller="Home" asp-action="LogOut">
-                            Log out
-                        </a>
+                        <form asp-controller="Home" asp-action="Logout" method="post" style="display:inline;">
+                            <button type="submit" class="btn bob-btn-outline">Log out</button>
+                        </form>
                     }
                 </div>
             </div>
@@ -133,7 +141,8 @@
                             data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body pt-2">
-                    <partial name="_LoginPartial" />
+                    @Html.AntiForgeryToken()
+                    @await Html.PartialAsync("Login")
                 </div>
             </div>
         </div>
@@ -147,14 +156,10 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
 
-    <%-- Theme persistence --%>
+    <%-- Theme toggle — full script stays here since it needs the button --%>
     <script>
-        (function () {
-            const saved = localStorage.getItem('bob-theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', saved);
-        })();
-
         document.getElementById('themeToggle').addEventListener('click', function () {
             const html = document.documentElement;
             const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';

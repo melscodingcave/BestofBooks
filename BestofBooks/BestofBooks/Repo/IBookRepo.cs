@@ -8,7 +8,6 @@ namespace BestofBooks.Repo
     public interface IBookRepo
     {
         Task<List<SelectListItem>> getAuthors();
-        Task<List<BookModel>> GetAvailableInventoryList();
         Task<List<SelectListItem>> getGenres();
         Task<List<BookModel>> GetInventoryList();
         Task<List<BookModel>> GetSearchList();
